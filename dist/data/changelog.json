@@ -1,0 +1,12 @@
+[
+  {
+    "timestamp": "2026-08-08T02:00:00+00:00",
+    "concertId": "cureguide:2026-08-07:vilnius:kaln-parkas",
+    "date": "2026-08-07",
+    "field": "setlist",
+    "old": "Unknown",
+    "new": "26 songs (unconfirmed)",
+    "source": "https://www.cure-concerts.de/concerts/2026-08-07.php",
+    "type": "NEW_SETLIST"
+  }
+]
