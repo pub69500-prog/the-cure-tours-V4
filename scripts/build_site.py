@@ -24,26 +24,101 @@ def as_bool(value) -> bool:
 
 
 def normalize_artist(value):
-    return str(value or "The Cure").strip().rstrip(":").strip().lower()
+    return (
+        str(value or "The Cure")
+        .strip()
+        .rstrip(":")
+        .strip()
+        .lower()
+    )
 
 
 def classify_event(c):
     """
-    Distingue les concerts Cure des apparitions chez d'autres artistes.
+    V4.7
+
+    Distingue les vrais concerts Cure des apparitions
+    chez d'autres artistes.
+
+    IMPORTANT :
+    "The Cure live concert" doit être considéré comme
+    un concert de The Cure et non comme une apparition.
     """
-    artist = str(c.get("artist") or "The Cure").strip().rstrip(":").strip()
-    is_core = normalize_artist(artist) in CORE_ARTISTS
 
-    existing = str(c.get("eventType") or "").strip()
+    raw_artist = (
+        str(c.get("artist") or "The Cure")
+        .strip()
+        .rstrip(":")
+        .strip()
+    )
 
-    if not is_core:
-        event_type = "Guest appearance"
-    elif existing and existing not in {"Concert", "Guest appearance"}:
-        event_type = existing
-    else:
-        event_type = "Concert"
+    artist_norm = normalize_artist(raw_artist)
 
-    return artist, is_core, event_type
+    # ============================================================
+    # THE CURE
+    # ============================================================
+
+    if (
+        artist_norm == "the cure"
+        or artist_norm.startswith("the cure ")
+    ):
+        return "The Cure", True, "Concert"
+
+    # ============================================================
+    # EASY CURE
+    # ============================================================
+
+    if (
+        artist_norm == "easy cure"
+        or artist_norm.startswith("easy cure ")
+    ):
+        return "Easy Cure", True, "Concert"
+
+    # ============================================================
+    # MALICE
+    # ============================================================
+
+    if (
+        artist_norm == "malice"
+        or artist_norm.startswith("malice ")
+    ):
+        return "Malice", True, "Concert"
+
+    # ============================================================
+    # SÉCURITÉ VIA LE TITRE DE LA PAGE
+    #
+    # Certaines données V4.6 peuvent avoir un champ "artist"
+    # incorrect alors que le titre Cure Concerts Guide indique
+    # clairement qu'il s'agit d'un concert Cure.
+    # ============================================================
+
+    page_title = (
+        str(c.get("pageTitle") or "")
+        .strip()
+        .lower()
+    )
+
+    if "the cure live concert" in page_title:
+        return "The Cure", True, "Concert"
+
+    if "easy cure live concert" in page_title:
+        return "Easy Cure", True, "Concert"
+
+    if "malice live concert" in page_title:
+        return "Malice", True, "Concert"
+
+    # ============================================================
+    # ARTISTE EXTÉRIEUR
+    #
+    # Seulement ici l'événement devient une apparition.
+    # Exemple : prestation avec Olivia Rodrigo.
+    # ============================================================
+
+    return (
+        raw_artist or "Unknown",
+        False,
+        "Guest appearance",
+    )
 
 
 def clean_song_rows(rows):
@@ -120,67 +195,135 @@ def build_frontend_concerts(concerts, setlists):
     for frontend_id, c in enumerate(ordered, start=1):
         canonical_id = str(c.get("id") or "")
 
-        rows = by_concert.get(canonical_id, [])
+        rows = by_concert.get(
+            canonical_id,
+            [],
+        )
 
         if not rows and c.get("date"):
-            same_date = by_date.get(c["date"], [])
+            same_date = by_date.get(
+                c["date"],
+                [],
+            )
 
-            if len(
-                {
-                    str(x.get("concertId") or "")
-                    for x in same_date
-                }
-            ) <= 1:
+            concert_ids = {
+                str(x.get("concertId") or "")
+                for x in same_date
+            }
+
+            if len(concert_ids) <= 1:
                 rows = same_date
 
         setlist = clean_song_rows(rows)
 
-        songs_played = c.get("songsPlayed")
+        songs_played = c.get(
+            "songsPlayed"
+        )
 
         if songs_played is None and setlist:
             songs_played = len(setlist)
 
         artist, is_core, event_type = classify_event(c)
 
-        capacity = c.get("concertCapacity")
+        capacity = c.get(
+            "concertCapacity"
+        )
 
         if capacity is None:
-            capacity = c.get("capacity")
+            capacity = c.get(
+                "capacity"
+            )
 
         if capacity is None:
-            capacity = c.get("generalVenueCapacity")
+            capacity = c.get(
+                "generalVenueCapacity"
+            )
 
         item = {
-            "id": frontend_id,
-            "date": c.get("date"),
-            "year": c.get("year"),
-            "city": c.get("city"),
-            "venue": c.get("venue"),
-            "country": c.get("country"),
-            "tour": c.get("tour"),
-            "songsPlayed": songs_played,
-            "attendance": c.get("attendance"),
-            "capacity": capacity,
-            "soldOut": as_bool(c.get("soldOut")),
-            "dow": c.get("dayOfWeek") or c.get("dow"),
-            "address": c.get("venueAddress") or c.get("address"),
-            "setlist": setlist,
+            "id":
+                frontend_id,
 
-            "canonicalId": canonical_id,
+            "date":
+                c.get("date"),
 
-            "artist": artist,
-            "eventType": event_type,
+            "year":
+                c.get("year"),
 
-            # NOUVEAU V4.6
-            "isTheCureConcert": is_core,
-            "guestAppearance": not is_core,
+            "city":
+                c.get("city"),
 
-            "event": c.get("event"),
-            "setLengthMin": c.get("setLengthMin"),
-            "setTime": c.get("setTime"),
-            "curfew": c.get("curfew"),
-            "sourceUrl": c.get("sourceUrl"),
-            "setlistFmUrl": c.get("setlistFmUrl"),
+            "venue":
+                c.get("venue"),
+
+            "country":
+                c.get("country"),
+
+            "tour":
+                c.get("tour"),
+
+            "songsPlayed":
+                songs_played,
+
+            "attendance":
+                c.get("attendance"),
+
+            "capacity":
+                capacity,
+
+            "soldOut":
+                as_bool(
+                    c.get("soldOut")
+                ),
+
+            "dow":
+                c.get("dayOfWeek")
+                or c.get("dow"),
+
+            "address":
+                c.get("venueAddress")
+                or c.get("address"),
+
+            "setlist":
+                setlist,
+
+            "canonicalId":
+                canonical_id,
+
+            # ====================================================
+            # CLASSIFICATION V4.7
+            # ====================================================
+
+            "artist":
+                artist,
+
+            "eventType":
+                event_type,
+
+            "isTheCureConcert":
+                is_core,
+
+            "guestAppearance":
+                not is_core,
+
+            # ====================================================
+
+            "event":
+                c.get("event"),
+
+            "setLengthMin":
+                c.get("setLengthMin"),
+
+            "setTime":
+                c.get("setTime"),
+
+            "curfew":
+                c.get("curfew"),
+
+            "sourceUrl":
+                c.get("sourceUrl"),
+
+            "setlistFmUrl":
+                c.get("setlistFmUrl"),
 
             "concertConfirmation":
                 c.get("concertConfirmation")
@@ -206,14 +349,14 @@ def build_frontend_concerts(concerts, setlists):
 def write_json(path: Path, value):
     path.parent.mkdir(
         parents=True,
-        exist_ok=True
+        exist_ok=True,
     )
 
     path.write_text(
         json.dumps(
             value,
             ensure_ascii=False,
-            separators=(",", ":")
+            separators=(",", ":"),
         ),
         encoding="utf-8",
     )
@@ -223,22 +366,22 @@ def main():
 
     concerts = load(
         "concerts.json",
-        []
+        [],
     )
 
     setlists = load(
         "setlists.json",
-        []
+        [],
     )
 
     changes = load(
         "changelog.json",
-        []
+        [],
     )
 
     state = load(
         "state.json",
-        {}
+        {},
     )
 
     if not SITE.exists():
@@ -249,57 +392,70 @@ def main():
     if DIST.exists():
         shutil.rmtree(DIST)
 
-    # Copie intégrale du frontend V4.6
+    # ============================================================
+    # COPIE DU FRONTEND
+    # ============================================================
+
     shutil.copytree(
         SITE,
-        DIST
+        DIST,
     )
 
     data_dir = DIST / "data"
 
     data_dir.mkdir(
         parents=True,
-        exist_ok=True
+        exist_ok=True,
     )
+
+    # ============================================================
+    # CONSTRUCTION DES DONNÉES FRONTEND
+    # ============================================================
 
     frontend_concerts = build_frontend_concerts(
         concerts,
-        setlists
+        setlists,
     )
 
-    # Fichier utilisé par l'interface
+    # Fichier utilisé directement par l'interface
     write_json(
         data_dir / "concerts.json",
-        frontend_concerts
+        frontend_concerts,
     )
 
     # Données canoniques
     write_json(
         data_dir / "canonical-concerts.json",
-        concerts
+        concerts,
     )
 
     write_json(
         data_dir / "setlists.json",
-        setlists
+        setlists,
     )
 
     write_json(
         data_dir / "changelog.json",
-        changes
+        changes,
     )
 
     write_json(
         data_dir / "state.json",
-        state
+        state,
     )
 
     # ============================================================
-    # STATISTIQUES
+    # STATISTIQUES V4.7
     #
-    # IMPORTANT :
-    # seules les prestations The Cure / Easy Cure / Malice
-    # participent aux statistiques principales.
+    # Les statistiques principales comprennent uniquement :
+    #
+    # - The Cure
+    # - Easy Cure
+    # - Malice
+    #
+    # Les véritables apparitions chez d'autres artistes restent
+    # visibles dans l'archive mais sont exclues des statistiques
+    # principales.
     # ============================================================
 
     core_concerts = [
@@ -319,11 +475,19 @@ def main():
         for c in core_concerts
     }
 
+    # ============================================================
+    # CONCERTS PAR ANNÉE
+    # ============================================================
+
     years = Counter(
         c.get("year")
         for c in core_concerts
         if c.get("year")
     )
+
+    # ============================================================
+    # PAYS
+    # ============================================================
 
     countries = Counter(
         c.get("country")
@@ -331,11 +495,23 @@ def main():
         if c.get("country")
     )
 
+    # ============================================================
+    # SALLES
+    # ============================================================
+
     venues = Counter(
         c.get("venue")
         for c in core_concerts
         if c.get("venue")
     )
+
+    # ============================================================
+    # TITRES JOUÉS
+    #
+    # IMPORTANT :
+    # seules les chansons appartenant aux vrais concerts Cure
+    # participent au classement.
+    # ============================================================
 
     songs = Counter(
         x.get("song")
@@ -343,7 +519,7 @@ def main():
 
         if x.get(
             "countsAsSong",
-            True
+            True,
         )
 
         and str(
@@ -357,23 +533,29 @@ def main():
         ).startswith("[")
     )
 
+    # ============================================================
+    # STATISTIQUES GLOBALES
+    # ============================================================
+
     stats = {
 
-        # Nombre réel de concerts Cure
+        # Vrais concerts Cure / Easy Cure / Malice
         "concerts":
             len(core_concerts),
 
-        # Apparitions chez d'autres artistes
+        # Véritables apparitions chez d'autres artistes
         "guestAppearances":
             len(guest_appearances),
 
-        # Total des événements conservés dans l'archive
+        # Ensemble des événements conservés
         "archiveEvents":
             len(concerts),
 
+        # Nombre d'événements frontend
         "frontendConcerts":
             len(frontend_concerts),
 
+        # Nombre brut de lignes de setlists
         "setlistEntries":
             len(setlists),
 
@@ -392,6 +574,10 @@ def main():
 
         "songs":
             songs.most_common(100),
+
+        # ========================================================
+        # CONFIRMATIONS CURE CONCERTS GUIDE
+        # ========================================================
 
         "confirmation": {
 
@@ -449,10 +635,13 @@ def main():
 
     write_json(
         data_dir / "stats.json",
-        stats
+        stats,
     )
 
-    # Vérification de cohérence
+    # ============================================================
+    # CONTRÔLES DE COHÉRENCE
+    # ============================================================
+
     if len(frontend_concerts) != len(concerts):
         raise SystemExit(
             "[build] ERROR: "
@@ -465,7 +654,7 @@ def main():
         for c in frontend_concerts
         if not isinstance(
             c.get("setlist"),
-            list
+            list,
         )
     ]
 
@@ -475,8 +664,12 @@ def main():
             "malformed frontend setlist data"
         )
 
+    # ============================================================
+    # RÉSUMÉ
+    # ============================================================
+
     print(
-        "[build] V4.6 dist ready:",
+        "[build] V4.7 dist ready:",
         len(core_concerts),
         "Cure concerts |",
         len(guest_appearances),
@@ -492,6 +685,26 @@ def main():
         ),
         "Cure performed-song entries",
     )
+
+    # ============================================================
+    # DIAGNOSTIC V4.7
+    #
+    # On affiche dans le log chaque événement encore considéré
+    # comme une apparition. Cela permettra de repérer immédiatement
+    # une nouvelle erreur de classification.
+    # ============================================================
+
+    for c in guest_appearances:
+        print(
+            "[build] guest appearance:",
+            c.get("date"),
+            "| artist:",
+            c.get("artist"),
+            "| city:",
+            c.get("city"),
+            "| venue:",
+            c.get("venue"),
+        )
 
 
 if __name__ == "__main__":
