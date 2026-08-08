@@ -47743,7 +47743,7 @@
     "venue": "Parc del Fòrum",
     "country": "Spain",
     "event": "Primavera Sound",
-    "songsPlayed": "29",
+    "songsPlayed": 29,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "147",
     "setTime": "22:16 - 00:43",
@@ -47759,8 +47759,13 @@
     "pageTitle": "2026-06-05 Barcelona - Parc del Fòrum (Spain) \"Primavera Sound\"",
     "scrapedAt": "46237.55342592593",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/estrella-damm-barcelona-spain-b4ee5fa.html",
+    "setlistFmId": "b4ee5fa",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-06:barcelona:parc-del-f-rum",
@@ -47801,7 +47806,7 @@
     "venue": "Estádio Municipal Dr. José Vieira de Carvalho",
     "country": "Portugal",
     "event": "North Festival",
-    "songsPlayed": "29",
+    "songsPlayed": 29,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "151",
     "setTime": "22:42 - 01:13",
@@ -47817,8 +47822,13 @@
     "pageTitle": "2026-06-07 Maia - Estádio Municipal Dr. José Vieira de Carvalho (Portugal) \"North Festival\"",
     "scrapedAt": "46237.55347222222",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/cidade-desportiva-da-maia-maia-portugal-734ef6b5.html",
+    "setlistFmId": "734ef6b5",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-12:nickelsdorf:pannonia-fields-ii",
@@ -47830,7 +47840,7 @@
     "venue": "Pannonia Fields II",
     "country": "Austria",
     "event": "Nova Rock",
-    "songsPlayed": "21",
+    "songsPlayed": 21,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "123",
     "setTime": "22:58 - 01:01",
@@ -47846,8 +47856,13 @@
     "pageTitle": "2026-06-12 Nickelsdorf - Pannonia Fields II (Austria) \"Nova Rock\"",
     "scrapedAt": "46237.5534837963",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/blue-stage-nickelsdorf-austria-5341f309.html",
+    "setlistFmId": "5341f309",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-14:firenze:visarno-arena",
@@ -47859,7 +47874,7 @@
     "venue": "Visarno Arena",
     "country": "Italy",
     "event": "Firenze Rocks",
-    "songsPlayed": "29",
+    "songsPlayed": 29,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": "21:25 - 23:50",
@@ -47875,8 +47890,13 @@
     "pageTitle": "2026-06-14 Firenze - Visarno Arena (Italy) \"Firenze Rocks\"",
     "scrapedAt": "46237.553506944445",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/ippodromo-del-visarno-florence-italy-6b4c2eda.html",
+    "setlistFmId": "6b4c2eda",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-20:landgraaf:megaland",
@@ -47888,7 +47908,7 @@
     "venue": "Megaland",
     "country": "Netherlands",
     "event": "Pinkpop",
-    "songsPlayed": "23",
+    "songsPlayed": 23,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "122",
     "setTime": "21:59 - 00:02",
@@ -47904,8 +47924,13 @@
     "pageTitle": "2026-06-20 Landgraaf - Megaland (Netherlands) \"Pinkpop\"",
     "scrapedAt": "46237.55351851852",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/south-stage-landgraaf-netherlands-634c9a4b.html",
+    "setlistFmId": "634c9a4b",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-21:newport-isle-of-wight:seaclose-park",
@@ -47917,7 +47942,7 @@
     "venue": "Seaclose Park",
     "country": "England",
     "event": "Isle of Wight Festival",
-    "songsPlayed": "27",
+    "songsPlayed": 27,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -47933,8 +47958,13 @@
     "pageTitle": "2026-06-21 Newport - Seaclose Park (England) \"Isle of Wight Festival\"",
     "scrapedAt": "46237.55354166667",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/main-stage-newport-england-13412165.html",
+    "setlistFmId": "13412165",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-24:cardiff:blackweir-fields",
@@ -47946,7 +47976,7 @@
     "venue": "Blackweir Fields",
     "country": "Wales",
     "event": "Blackweir",
-    "songsPlayed": "28",
+    "songsPlayed": 28,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "141",
     "setTime": "20:05 - 22:26",
@@ -47962,8 +47992,13 @@
     "pageTitle": "2026-06-24 Cardiff - Blackweir Fields (Wales) \"Blackweir\"",
     "scrapedAt": "46237.553564814814",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/blackweir-fields-cardiff-wales-5b4ea354.html",
+    "setlistFmId": "5b4ea354",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-26:dublin:marlay-park",
@@ -47975,7 +48010,7 @@
     "venue": "Marlay Park",
     "country": "Ireland",
     "event": null,
-    "songsPlayed": "28",
+    "songsPlayed": 28,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "139",
     "setTime": "20:18 - 22:37",
@@ -47991,8 +48026,13 @@
     "pageTitle": "2026-06-26 Dublin - Marlay Park (Ireland)",
     "scrapedAt": "46237.55357638889",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/marlay-park-dublin-ireland-3411567.html",
+    "setlistFmId": "3411567",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-06-28:belfast:ormeau-park",
@@ -48004,7 +48044,7 @@
     "venue": "Ormeau Park",
     "country": "Northern Ireland",
     "event": "Belsonic",
-    "songsPlayed": "27",
+    "songsPlayed": 27,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "143",
     "setTime": "20:27 - 22:50",
@@ -48020,8 +48060,13 @@
     "pageTitle": "2026-06-28 Belfast - Ormeau Park (Northern Ireland) \"Belsonic\"",
     "scrapedAt": "46237.55359953704",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/ormeau-park-belfast-northern-ireland-13411565.html",
+    "setlistFmId": "13411565",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-01:roskilde:festivalpladsen",
@@ -48033,7 +48078,7 @@
     "venue": "Festivalpladsen",
     "country": "Denmark",
     "event": "Roskilde Festival",
-    "songsPlayed": "27",
+    "songsPlayed": 27,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -48049,8 +48094,13 @@
     "pageTitle": "2026-07-01 Roskilde - Festivalpladsen (Denmark) \"Roskilde Festival\"",
     "scrapedAt": "46237.553622685184",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/the-orange-stage-roskilde-denmark-1b4fb924.html",
+    "setlistFmId": "1b4fb924",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-03:gdynia:port-lotniczy-gdynia-kosakowo",
@@ -48062,7 +48112,7 @@
     "venue": "Port Lotniczy Gdynia-Kosakowo",
     "country": "Poland",
     "event": "Open'er Festival",
-    "songsPlayed": "26",
+    "songsPlayed": 26,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -48078,8 +48128,13 @@
     "pageTitle": "2026-07-03 Gdynia - Port Lotniczy Gdynia-Kosakowo (Poland) \"Open'er Festival\"",
     "scrapedAt": "46237.55363425926",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/lotnisko-gdynia-kosakowo-gdynia-poland-53410f29.html",
+    "setlistFmId": "53410f29",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-05:werchter:festival-park-werchter",
@@ -48091,7 +48146,7 @@
     "venue": "Festival Park Werchter",
     "country": "Belgium",
     "event": "Rock Werchter",
-    "songsPlayed": "29",
+    "songsPlayed": 29,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "140",
     "setTime": "22:29 - 00:49",
@@ -48107,8 +48162,13 @@
     "pageTitle": "2026-07-05 Werchter - Festival Park Werchter (Belgium) \"Rock Werchter\"",
     "scrapedAt": "46237.55365740741",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/main-stage-werchter-belgium-2341407f.html",
+    "setlistFmId": "2341407f",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-08:tren-n:letisko-tren-n",
@@ -48120,7 +48180,7 @@
     "venue": "Letisko Trenčín",
     "country": "Slovakia",
     "event": "Pohoda Festival",
-    "songsPlayed": "28",
+    "songsPlayed": 28,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "145",
     "setTime": "21:28 - 23:53",
@@ -48136,8 +48196,13 @@
     "pageTitle": "2026-07-08 Trenčín - Letisko Trenčín (Slovakia) \"Pohoda Festival\"",
     "scrapedAt": "46237.55368055555",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/letisko-trenin-slovakia-3b4e58c0.html",
+    "setlistFmId": "3b4e58c0",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-10:berlin:parkb-hne-wuhlheide",
@@ -48149,7 +48214,7 @@
     "venue": "Parkbühne Wuhlheide",
     "country": "Germany",
     "event": null,
-    "songsPlayed": "26",
+    "songsPlayed": 26,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "131",
     "setTime": "20:37 - 22:48",
@@ -48165,8 +48230,13 @@
     "pageTitle": "2026-07-10 Berlin - Parkbühne Wuhlheide (Germany)",
     "scrapedAt": "46237.55369212963",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/parkbuhne-wuhlheide-berlin-germany-43414327.html",
+    "setlistFmId": "43414327",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-11:berlin:parkb-hne-wuhlheide",
@@ -48178,7 +48248,7 @@
     "venue": "Parkbühne Wuhlheide",
     "country": "Germany",
     "event": null,
-    "songsPlayed": "27",
+    "songsPlayed": 27,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "137",
     "setTime": "20:28 - 22:45",
@@ -48194,8 +48264,13 @@
     "pageTitle": "2026-07-11 Berlin - Parkbühne Wuhlheide (Germany)",
     "scrapedAt": "46237.553715277776",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/parkbuhne-wuhlheide-berlin-germany-4b414326.html",
+    "setlistFmId": "4b414326",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-12:berlin:parkb-hne-wuhlheide",
@@ -48207,7 +48282,7 @@
     "venue": "Parkbühne Wuhlheide",
     "country": "Germany",
     "event": null,
-    "songsPlayed": "28",
+    "songsPlayed": 28,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "136",
     "setTime": "19:39 - 21:55",
@@ -48223,8 +48298,13 @@
     "pageTitle": "2026-07-12 Berlin - Parkbühne Wuhlheide (Germany)",
     "scrapedAt": "46237.55373842592",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/parkbuhne-wuhlheide-berlin-germany-6b4ef66a.html",
+    "setlistFmId": "6b4ef66a",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-15:ath-na-athens:telekom-center-athens-p5",
@@ -48236,7 +48316,7 @@
     "venue": "Telekom Center Athens / P5",
     "country": "Greece",
     "event": "Ejekt Festival",
-    "songsPlayed": "27",
+    "songsPlayed": 27,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "130",
     "setTime": "21:00 - 23:10",
@@ -48252,8 +48332,13 @@
     "pageTitle": "2026-07-15 Athína - Telekom Center Athens / P5 (Greece) \"Ejekt Festival\"",
     "scrapedAt": "46237.55375",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/olympic-complex-athens-greece-634e52af.html",
+    "setlistFmId": "634e52af",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-17:plowdiw:grebna-baza",
@@ -48265,7 +48350,7 @@
     "venue": "Grebna Baza",
     "country": "Bulgaria",
     "event": "PhillGood Festival",
-    "songsPlayed": "26",
+    "songsPlayed": 26,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -48281,8 +48366,13 @@
     "pageTitle": "2026-07-17 Plowdiw - Grebna Baza (Bulgaria) \"PhillGood Festival\"",
     "scrapedAt": "46237.553773148145",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/rowing-canal-plovdiv-bulgaria-334ed829.html",
+    "setlistFmId": "334ed829",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-19:bon-ida-cluj-napoca:castelul-b-nffy",
@@ -48294,7 +48384,7 @@
     "venue": "Castelul Bánffy",
     "country": "Romania",
     "event": "Electric Castle",
-    "songsPlayed": "24",
+    "songsPlayed": 24,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "124",
     "setTime": null,
@@ -48310,8 +48400,13 @@
     "pageTitle": "2026-07-19 Bonțida - Castelul Bánffy (Romania) \"Electric Castle\"",
     "scrapedAt": "46237.55378472222",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/castelul-banffy-de-la-bonida-comuna-bonida-romania-73762275.html",
+    "setlistFmId": "73762275",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-22:nyon:plaine-de-l-asse",
@@ -48323,7 +48418,7 @@
     "venue": "Plaine de l'Asse",
     "country": "Switzerland",
     "event": "Paleo Festival",
-    "songsPlayed": "24",
+    "songsPlayed": 24,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -48339,8 +48434,13 @@
     "pageTitle": "2026-07-22 Nyon - Plaine de l'Asse (Switzerland) \"Paleo Festival\"",
     "scrapedAt": "46237.55380787037",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/grande-scene-nyon-switzerland-1b490188.html",
+    "setlistFmId": "1b490188",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-24:n-mes:ar-nes-de-n-mes",
@@ -48352,7 +48452,7 @@
     "venue": "Arènes de Nîmes",
     "country": "France",
     "event": "Festival de Nîmes",
-    "songsPlayed": "30",
+    "songsPlayed": 30,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "155",
     "setTime": "21:27 - 00:02",
@@ -48368,8 +48468,13 @@
     "pageTitle": "2026-07-24 Nîmes - Arènes de Nîmes (France) \"Festival de Nîmes\"",
     "scrapedAt": "46237.55383101852",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/arenes-de-nimes-nimes-france-234c6813.html",
+    "setlistFmId": "234c6813",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-25:n-mes:ar-nes-de-n-mes",
@@ -48381,7 +48486,7 @@
     "venue": "Arènes de Nîmes",
     "country": "France",
     "event": "Festival de Nîmes",
-    "songsPlayed": "30",
+    "songsPlayed": 30,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "157",
     "setTime": "21:27 - 00:04",
@@ -48397,8 +48502,13 @@
     "pageTitle": "2026-07-25 Nîmes - Arènes de Nîmes (France) \"Festival de Nîmes\"",
     "scrapedAt": "46237.55384259259",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/arenes-de-nimes-nimes-france-334c6811.html",
+    "setlistFmId": "334c6811",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-07-26:n-mes:ar-nes-de-n-mes",
@@ -48410,7 +48520,7 @@
     "venue": "Arènes de Nîmes",
     "country": "France",
     "event": "Festival de Nîmes",
-    "songsPlayed": "30",
+    "songsPlayed": 30,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": "157",
     "setTime": "21:26 - 00:03",
@@ -48426,8 +48536,13 @@
     "pageTitle": "2026-07-26 Nîmes - Arènes de Nîmes (France) \"Festival de Nîmes\"",
     "scrapedAt": "46237.55386574074",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/arenes-de-nimes-nimes-france-234d2cc3.html",
+    "setlistFmId": "234d2cc3",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-08-07:vilnius:kaln-parkas",
@@ -48440,23 +48555,28 @@
     "country": "Lithuania",
     "event": "Sounds Good Vilnius",
     "songsPlayed": 26,
-    "setlistStatus": "Unconfirmed",
-    "setLengthMin": 136,
-    "setTime": "20:43 - 22:59",
-    "curfew": "23:00",
+    "setlistStatus": "Unknown",
+    "setLengthMin": null,
+    "setTime": null,
+    "curfew": null,
     "dayOfWeek": "Friday",
     "tour": "Festival Summer",
     "attendance": null,
     "concertCapacity": null,
     "soldOut": "False",
-    "venueAddress": "T. Kosciuškos g. 1B, Vilnius, 01100 Vilniaus m. sav.",
+    "venueAddress": "T. Kosciuškos g. 1B | Vilnius, 01100 Vilniaus m. sav.",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-07.php",
     "pageTitle": "2026-08-07 Vilnius - Kalnų Parkas (Lithuania) \"Sounds Good Vilnius\"",
-    "scrapedAt": "2026-08-07",
+    "scrapedAt": "46237.55388888889",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/kaln-parkas-vilnius-lithuania-6349122f.html",
+    "setlistFmId": "6349122f",
+    "setlistFmStatus": "Community",
+    "setlistConfirmation": "Unknown"
   },
   {
     "id": "cureguide:2026-08-09:tallinn:unibet-arena-kvartal",
@@ -48484,8 +48604,11 @@
     "pageTitle": "2026-08-09 Tallinn - Unibet Arena Kvartal (Estonia)",
     "scrapedAt": "46237.55390046296",
     "sources": {
-      "primary": "cure-concerts.de"
-    }
+      "primary": "cure-concerts.de",
+      "secondary": "setlist.fm"
+    },
+    "setlistFmUrl": "https://www.setlist.fm/setlist/the-cure/2026/unibet-arena-tallinn-estonia-7349122d.html",
+    "setlistFmId": "7349122d"
   },
   {
     "id": "cureguide:2026-08-12:oslo:t-yenparken",
