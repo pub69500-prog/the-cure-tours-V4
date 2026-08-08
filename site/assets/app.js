@@ -484,9 +484,13 @@ function renderAllTitles(){
 
   let scopeConcerts = CORE_CONCERTS;
   let scopeLabel = 'dans le monde';
-  if(scope==='country' && country){
-    scopeConcerts = CORE_CONCERTS.filter(c=>c.country===country);
-    scopeLabel = `en ${country}`;
+if(scope==='country' && country){
+  scopeConcerts = CORE_CONCERTS.filter(c=>c.country===country);
+  scopeLabel = `en ${country}`;
+} else if(scope==='city' && city){
+  scopeConcerts = CORE_CONCERTS.filter(c=>c.city===city);
+  scopeLabel = `à ${city}`;
+}
        const localMap = new Map();
   scopeConcerts.forEach(c=>{
     c.setlist.forEach(entry=>{
@@ -997,7 +1001,4 @@ document.querySelector('button[data-tab="map"]').addEventListener('click', initM
 document.getElementById('theme-toggle').addEventListener('click', ()=>{
   if(mapInitialized) renderMap();
 });
-  } else if(scope==='city' && city){
-    scopeConcerts = CORE_CONCERTS.filter(c=>c.city===city);
-    scopeLabel = `à ${city}`;
-  }
+ 
