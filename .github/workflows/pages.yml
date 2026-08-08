@@ -27,7 +27,7 @@ jobs:
       - name: Synchronize Cure Concerts Guide
         env:
           CUREGUIDE_RESPECT_ROBOTS: 'true'
-        run: python scripts/sync_cureguide.py
+        run: python -u scripts/sync_cureguide.py
       - name: Synchronize setlist.fm
         env:
           SETLISTFM_API_KEY: ${{ secrets.SETLISTFM_API_KEY }}
