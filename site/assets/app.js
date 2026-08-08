@@ -1,8 +1,43 @@
-
 /* ======================================================================
    DATA
    ====================================================================== */
 const CONCERTS = JSON.parse(document.getElementById('data-concerts').textContent);
+
+/*
+ * V4.6 — distinguish real Cure-family concerts from guest appearances.
+ *
+ * Cure Concerts Guide sometimes includes an entire set by another artist when
+ * a Cure member guests with them (e.g. Olivia Rodrigo / Robert Smith).
+ * Those events stay searchable in the archive, but MUST NOT contaminate
+ * The Cure concert/song/ranking/map statistics.
+ */
+const CORE_ARTISTS = new Set(['the cure', 'easy cure', 'malice']);
+
+function normArtist(value){
+  return String(value || 'The Cure')
+    .trim()
+    .replace(/:\s*$/, '')
+    .toLowerCase();
+}
+
+function isCoreConcert(c){
+  if(c && c.isTheCureConcert === false) return false;
+  if(c && c.eventType === 'Guest appearance') return false;
+  return CORE_ARTISTS.has(normArtist(c?.artist));
+}
+
+function isGuestAppearance(c){
+  return !isCoreConcert(c);
+}
+
+function appearanceLabel(c){
+  if(!isGuestAppearance(c)) return '';
+  const artist = String(c.artist || '').replace(/:\s*$/, '').trim();
+  return artist || 'Artiste invité';
+}
+
+const CORE_CONCERTS = CONCERTS.filter(isCoreConcert);
+const GUEST_APPEARANCES = CONCERTS.filter(isGuestAppearance);
 
 /* ======================================================================
    HELPERS
@@ -21,6 +56,7 @@ function fmtDate(d){
 
 /* ======================================================================
    AGGREGATES (computed once)
+   Main statistics intentionally use CORE_CONCERTS only.
    ====================================================================== */
 const songMap = new Map();   // song -> {count, years:Map, tours:Set, concerts:[]}
 const venueMap = new Map();
@@ -30,12 +66,20 @@ const tourMap = new Map();
 const yearMap = new Map();
 const decadeMap = new Map();
 
+const allCountryMap = new Map();
+const allTourMap = new Map();
+
 function bump(map, key, inc=1){
   if(key==null || key==='') return;
   map.set(key, (map.get(key)||0)+inc);
 }
 
 CONCERTS.forEach(c=>{
+  bump(allCountryMap, c.country);
+  bump(allTourMap, c.tour);
+});
+
+CORE_CONCERTS.forEach(c=>{
   bump(venueMap, c.venue);
   bump(cityMap, c.city);
   bump(countryMap, c.country);
@@ -45,8 +89,9 @@ CONCERTS.forEach(c=>{
     const dec = Math.floor(c.year/10)*10;
     bump(decadeMap, dec);
   }
-  c.setlist.forEach(entry=>{
+  (c.setlist || []).forEach(entry=>{
     const s = entry.song;
+    if(!s) return;
     if(!songMap.has(s)) songMap.set(s, {count:0, years:new Map(), tours:new Set(), concerts:[]});
     const rec = songMap.get(s);
     rec.count++;
@@ -56,18 +101,20 @@ CONCERTS.forEach(c=>{
   });
 });
 
-const TOTAL_CONCERTS = CONCERTS.length;
-const TOTAL_SETLIST_ENTRIES = CONCERTS.reduce((a,c)=>a+c.setlist.length,0);
+const TOTAL_CONCERTS = CORE_CONCERTS.length;
+const TOTAL_GUEST_APPEARANCES = GUEST_APPEARANCES.length;
+const TOTAL_SETLIST_ENTRIES = CORE_CONCERTS.reduce((a,c)=>a+(c.setlist || []).length,0);
 const TOTAL_UNIQUE_SONGS = songMap.size;
 const TOTAL_COUNTRIES = countryMap.size;
-const YEARS = CONCERTS.map(c=>c.year).filter(Boolean);
+const YEARS = CORE_CONCERTS.map(c=>c.year).filter(Boolean);
 const YEAR_MIN = Math.min(...YEARS), YEAR_MAX = Math.max(...YEARS);
 
 /* ======================================================================
    KPI ROW
    ====================================================================== */
 document.getElementById('kpi-row').innerHTML = `
-  <div class="kpi"><div class="num">${fmtInt(TOTAL_CONCERTS)}</div><div class="lbl">Concerts</div></div>
+  <div class="kpi"><div class="num">${fmtInt(TOTAL_CONCERTS)}</div><div class="lbl">Concerts Cure</div></div>
+  ${TOTAL_GUEST_APPEARANCES ? `<div class="kpi"><div class="num">${fmtInt(TOTAL_GUEST_APPEARANCES)}</div><div class="lbl">Apparitions invitées</div></div>` : ``}
   <div class="kpi"><div class="num">${fmtInt(TOTAL_UNIQUE_SONGS)}</div><div class="lbl">Titres distincts</div></div>
   <div class="kpi"><div class="num">${fmtInt(TOTAL_SETLIST_ENTRIES)}</div><div class="lbl">Interprétations</div></div>
   <div class="kpi"><div class="num">${fmtInt(TOTAL_COUNTRIES)}</div><div class="lbl">Pays</div></div>
@@ -137,7 +184,7 @@ renderRankListInto('top-countries', topN(countryMap,10), null, {clickable:true})
 renderRankListInto('top-venues', topN(venueMap,10), null, {clickable:true});
 
 function renderTracklistOverview(){
-  const top = topN(songMap.entries ? songMap : songMap, 0); // placeholder replaced below
+  const top = topN(songMap.entries ? songMap : songMap, 0);
 }
 (function(){
   const arr = [...songMap.entries()].map(([name,rec])=>[name,rec.count]).sort((a,b)=>b[1]-a[1]).slice(0,10);
@@ -156,7 +203,6 @@ function renderTracklistOverview(){
   });
 })();
 
-// clickable rank rows (countries/venues) filter the Concerts tab
 document.getElementById('top-countries').addEventListener('click', e=>{
   const row = e.target.closest('.rank-row'); if(!row) return;
   document.querySelector('button[data-tab="concerts"]').click();
@@ -174,19 +220,33 @@ document.getElementById('top-venues').addEventListener('click', e=>{
    CONCERTS TAB — filters, sort, paginate
    ====================================================================== */
 const countrySel = document.getElementById('f-country');
-[...countryMap.keys()].sort().forEach(c=>{
-  const o=document.createElement('option'); o.value=c; o.textContent=`${c} (${countryMap.get(c)})`;
+[...allCountryMap.keys()].sort().forEach(c=>{
+  const o=document.createElement('option'); o.value=c; o.textContent=`${c} (${allCountryMap.get(c)})`;
   countrySel.appendChild(o);
 });
 const tourSel = document.getElementById('f-tour');
-[...tourMap.keys()].sort((a,b)=>tourMap.get(b)-tourMap.get(a)).forEach(t=>{
-  const o=document.createElement('option'); o.value=t; o.textContent=`${t} (${tourMap.get(t)})`;
+[...allTourMap.keys()].sort((a,b)=>allTourMap.get(b)-allTourMap.get(a)).forEach(t=>{
+  const o=document.createElement('option'); o.value=t; o.textContent=`${t} (${allTourMap.get(t)})`;
   tourSel.appendChild(o);
 });
 const songSel = document.getElementById('f-song');
+
+const resetField = document.getElementById('f-reset')?.closest('.field');
+const typeField = document.createElement('div');
+typeField.className = 'field';
+typeField.innerHTML = `
+  <label>Type</label>
+  <select id="f-event-type">
+    <option value="">Tous</option>
+    <option value="core">Concerts Cure</option>
+    <option value="guest">Apparitions invitées</option>
+  </select>`;
+if(resetField) resetField.parentNode.insertBefore(typeField, resetField);
+const eventTypeSel = document.getElementById('f-event-type');
+
 [...songMap.keys()].sort().forEach(s=>{
   const o=document.createElement('option'); o.value=s; o.textContent=s;
-  songSel.appendChild(o);
+     songSel.appendChild(o);
 });
 
 let sortKey='date', sortDir='asc', page=1;
@@ -200,15 +260,18 @@ function applyFilters(){
   const yMin = parseInt(document.getElementById('f-year-min').value)||null;
   const yMax = parseInt(document.getElementById('f-year-max').value)||null;
   const song = songSel.value;
+  const eventType = eventTypeSel?.value || '';
 
   filtered = CONCERTS.filter(c=>{
+    if(eventType==='core' && !isCoreConcert(c)) return false;
+    if(eventType==='guest' && !isGuestAppearance(c)) return false;
     if(country && c.country!==country) return false;
     if(tour && c.tour!==tour) return false;
     if(yMin && (!c.year || c.year<yMin)) return false;
     if(yMax && (!c.year || c.year>yMax)) return false;
     if(song && !c.setlist.some(s=>s.song===song)) return false;
     if(q){
-      const hay = `${c.city||''} ${c.venue||''} ${c.tour||''} ${c.country||''}`.toLowerCase();
+      const hay = `${c.artist||''} ${c.city||''} ${c.venue||''} ${c.tour||''} ${c.country||''}`.toLowerCase();
       if(!hay.includes(q)) return false;
     }
     return true;
@@ -238,8 +301,8 @@ function renderTable(){
   document.getElementById('concerts-tbody').innerHTML = rows.map(c=>`
     <tr data-id="${c.id}">
       <td class="date-cell">${fmtDate(c.date)}</td>
-      <td class="city-cell">${esc(c.city)||'—'}</td>
-      <td>${esc(c.venue)||'—'}</td>
+      <td class="city-cell">${esc(c.city)||'—'} ${isGuestAppearance(c)?'<span class="badge" title="Cette ligne est une apparition d’un membre de The Cure chez un autre artiste et n’est pas comptée dans les statistiques principales.">APPARITION</span>':''}</td>
+      <td>${isGuestAppearance(c)?`<strong>${esc(appearanceLabel(c))}</strong> · `:''}${esc(c.venue)||'—'}</td>
       <td>${esc(c.country)||'—'}</td>
       <td>${esc(c.tour)||'—'}</td>
       <td>${c.songsPlayed ?? '—'}</td>
@@ -247,7 +310,6 @@ function renderTable(){
     </tr>
   `).join('') || `<tr><td colspan="7"><div class="empty-state">Aucun concert ne correspond à ces critères.</div></td></tr>`;
 
-  // pagination
   const totalPages = Math.max(1, Math.ceil(filtered.length/PAGE_SIZE));
   const pag = document.getElementById('pagination');
   pag.innerHTML = `
@@ -275,13 +337,13 @@ document.querySelectorAll('#tab-concerts thead th[data-key]').forEach(th=>{
   });
 });
 
-['f-search','f-country','f-tour','f-year-min','f-year-max','f-song'].forEach(id=>{
+['f-search','f-country','f-tour','f-year-min','f-year-max','f-song','f-event-type'].forEach(id=>{
   document.getElementById(id).addEventListener('input', applyFilters);
   document.getElementById(id).addEventListener('change', applyFilters);
 });
 document.getElementById('f-reset').addEventListener('click', ()=>{
   document.getElementById('f-search').value='';
-  countrySel.value=''; tourSel.value=''; songSel.value='';
+  countrySel.value=''; tourSel.value=''; songSel.value=''; if(eventTypeSel) eventTypeSel.value='';
   document.getElementById('f-year-min').value='';
   document.getElementById('f-year-max').value='';
   applyFilters();
@@ -296,8 +358,10 @@ function openTicket(id){
   const c = CONCERTS.find(x=>x.id===id);
   if(!c) return;
   document.getElementById('ticket-city').textContent = `${c.city||'Lieu inconnu'} — ${fmtDate(c.date)}`;
-  document.getElementById('ticket-venue').textContent = `${c.venue||'Salle inconnue'}${c.country?', '+c.country:''}`;
+  document.getElementById('ticket-venue').textContent = `${isGuestAppearance(c)?appearanceLabel(c)+' — ':''}${c.venue||'Salle inconnue'}${c.country?', '+c.country:''}`;
   document.getElementById('ticket-meta').innerHTML = `
+    <div><div class="m-lbl">Artiste</div><div class="m-val">${esc(c.artist)||'The Cure'}</div></div>
+    <div><div class="m-lbl">Type</div><div class="m-val">${isGuestAppearance(c)?'<span class="badge">APPARITION INVITÉE</span>':'Concert Cure'}</div></div>
     <div><div class="m-lbl">Tournée</div><div class="m-val">${esc(c.tour)||'—'}</div></div>
     <div><div class="m-lbl">Jour</div><div class="m-val">${esc(c.dow)||'—'}</div></div>
     <div><div class="m-lbl">Chansons</div><div class="m-val">${c.songsPlayed ?? c.setlist.length ?? '—'}</div></div>
@@ -305,8 +369,11 @@ function openTicket(id){
     <div><div class="m-lbl">Capacité</div><div class="m-val">${c.capacity ? fmtInt(c.capacity) : '—'}</div></div>
     <div><div class="m-lbl">Sold out</div><div class="m-val">${c.soldOut ? 'Oui' : 'Non'}</div></div>
   `;
+  const guestNotice = isGuestAppearance(c)
+    ? `<div class="panel" style="margin-bottom:16px;padding:14px"><strong>Apparition invitée</strong><br><span style="color:var(--text-dim)">Cette setlist appartient à ${esc(appearanceLabel(c))}. Elle est conservée à titre documentaire mais ses titres ne sont pas comptés dans les statistiques musicales de The Cure.</span></div>`
+    : '';
   if(c.setlist.length===0){
-    document.getElementById('ticket-body').innerHTML = `<div class="empty-state">Setlist inconnue pour cette date.</div>`;
+    document.getElementById('ticket-body').innerHTML = guestNotice + `<div class="empty-state">Setlist inconnue pour cette date.</div>`;
   } else {
     const sections = {};
     c.setlist.forEach(s=>{ (sections[s.section] = sections[s.section]||[]).push(s); });
@@ -318,7 +385,7 @@ function openTicket(id){
       if(ib === -1) return -1;
       return ia - ib;
     });
-    document.getElementById('ticket-body').innerHTML = orderedSections.map(([sec,items])=>{
+    document.getElementById('ticket-body').innerHTML = guestNotice + orderedSections.map(([sec,items])=>{
       const songs = items.slice().sort((a,b)=>(a.pos ?? 999) - (b.pos ?? 999));
       return `
       <div class="setlist-section">
@@ -338,9 +405,8 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.getEleme
 /* ======================================================================
    ALL TITLES TAB
    ====================================================================== */
-// country -> Set(cities), for the dependent city dropdown
 const countryCities = new Map();
-CONCERTS.forEach(c=>{
+CORE_CONCERTS.forEach(c=>{
   if(!c.country || !c.city) return;
   if(!countryCities.has(c.country)) countryCities.set(c.country, new Set());
   countryCities.get(c.country).add(c.city);
@@ -353,7 +419,6 @@ const atCountryField = document.getElementById('at-country-field');
 const atCityField = document.getElementById('at-city-field');
 const atSearchInput = document.getElementById('at-search');
 
-// populate country select (all countries, sorted by name)
 [...countryMap.keys()].sort().forEach(c=>{
   const o=document.createElement('option'); o.value=c; o.textContent=`${c} (${countryMap.get(c)} concerts)`;
   atCountrySel.appendChild(o);
@@ -417,19 +482,12 @@ function renderAllTitles(){
   const city = atCitySel.value;
   const q = atSearchInput.value.trim().toLowerCase();
 
-  // determine the concert scope
-  let scopeConcerts = CONCERTS;
+  let scopeConcerts = CORE_CONCERTS;
   let scopeLabel = 'dans le monde';
   if(scope==='country' && country){
-    scopeConcerts = CONCERTS.filter(c=>c.country===country);
+    scopeConcerts = CORE_CONCERTS.filter(c=>c.country===country);
     scopeLabel = `en ${country}`;
-  } else if(scope==='city' && city){
-    scopeConcerts = CONCERTS.filter(c=>c.city===city);
-    scopeLabel = `à ${city}`;
-  }
-
-  // recompute song counts for this scope, from scratch (fully accurate, no shortcuts)
-  const localMap = new Map(); // song -> {count, first, last}
+       const localMap = new Map();
   scopeConcerts.forEach(c=>{
     c.setlist.forEach(entry=>{
       const s = entry.song;
@@ -519,12 +577,17 @@ function renderRankingsTab(){
   [...el.querySelectorAll('.rank-row')].forEach(row=>{
     row.addEventListener('click', ()=>{
       const val = row.dataset.val;
-      if(clickable==='song'){ document.querySelector('button[data-tab="songs"]').click(); goToSong(val); }
-      else {
+      if(clickable==='song'){
+        document.querySelector('button[data-tab="songs"]').click();
+        goToSong(val);
+      } else {
         document.querySelector('button[data-tab="concerts"]').click();
         if(clickable==='country') countrySel.value=val;
         else if(clickable==='tour') tourSel.value=val;
-        else if(clickable==='year'){ document.getElementById('f-year-min').value=val; document.getElementById('f-year-max').value=val; }
+        else if(clickable==='year'){
+          document.getElementById('f-year-min').value=val;
+          document.getElementById('f-year-max').value=val;
+        }
         else document.getElementById('f-search').value=val;
         applyFilters();
       }
@@ -568,7 +631,10 @@ function goToSong(name){
 
 function renderSongDetail(name){
   const rec = songMap.get(name);
-  if(!rec){ document.getElementById('song-detail').innerHTML = `<div class="empty-state">Titre introuvable.</div>`; return; }
+  if(!rec){
+    document.getElementById('song-detail').innerHTML = `<div class="empty-state">Titre introuvable.</div>`;
+    return;
+  }
   const sortedConcerts = rec.concerts.slice().sort((a,b)=>a.date.localeCompare(b.date));
   const first = sortedConcerts[0], last = sortedConcerts[sortedConcerts.length-1];
   const years = [...rec.years.entries()].sort((a,b)=>a[0]-b[0]);
@@ -581,7 +647,7 @@ function renderSongDetail(name){
     const x = i*(w/years.length);
     const bh = (y[1]/maxY)*(h-padB-16);
     bars += `<rect class="chart-bar" x="${x}" y="${h-padB-bh}" width="${bw}" height="${bh}" rx="1"><title>${y[0]}: ${y[1]}</title></rect>`;
-    if(years.length<45) bars += `<text x="${x+bw/2}" y="${h-6}" font-size="9" text-anchor="middle" transform="rotate(0)">${String(y[0]).slice(2)}</text>`;
+    if(years.length<45) bars += `<text x="${x+bw/2}" y="${h-6}" font-size="9" text-anchor="middle">${String(y[0]).slice(2)}</text>`;
   });
 
   document.getElementById('song-detail').innerHTML = `
@@ -629,7 +695,10 @@ const compareColors = ['#e63a56','#a897c9','#c9a15f','#6fb3a8'];
 let compareList = [];
 
 bindSongSearch(compareInput, compareDropdown, name=>{
-  if(compareList.includes(name) || compareList.length>=4) { compareInput.value=''; return; }
+  if(compareList.includes(name) || compareList.length>=4){
+    compareInput.value='';
+    return;
+  }
   compareList.push(name);
   compareInput.value='';
   renderCompare();
@@ -658,13 +727,16 @@ function renderCompare(){
     document.getElementById('compare-chart').innerHTML = `<div class="empty-state">Ajoutez des chansons pour comparer leur fréquence de jeu au fil des années.</div>`;
     return;
   }
+
   const yMinAll = YEAR_MIN, yMaxAll = YEAR_MAX;
   const allYears = [];
   for(let y=yMinAll; y<=yMaxAll; y++) allYears.push(y);
+
   const series = compareList.map(s=>{
     const rec = songMap.get(s);
     return allYears.map(y=>rec.years.get(y)||0);
   });
+
   const maxVal = Math.max(1, ...series.flat());
   const w = Math.max(700, allYears.length*16), h=240, padB=28, padL=6;
   const stepX = (w-padL)/allYears.length;
@@ -678,13 +750,14 @@ function renderCompare(){
       d += (i===0?'M':'L')+x+','+y+' ';
     });
     paths += `<path d="${d}" fill="none" stroke="${compareColors[si]}" stroke-width="2"/>`;
-    s.forEach((v,i)=>{
+         s.forEach((v,i)=>{
       if(v===0) return;
       const x = padL + i*stepX + stepX/2;
       const y = h-padB - (v/maxVal)*(h-padB-16);
       paths += `<circle cx="${x}" cy="${y}" r="2.5" fill="${compareColors[si]}"><title>${allYears[i]}: ${v}</title></circle>`;
     });
   });
+
   let labels='';
   allYears.forEach((y,i)=>{
     if(i%5===0){
@@ -692,6 +765,7 @@ function renderCompare(){
       labels += `<text x="${x}" y="${h-8}" font-size="10" text-anchor="middle">${y}</text>`;
     }
   });
+
   document.getElementById('compare-chart').innerHTML =
     `<div style="overflow-x:auto;"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${paths}${labels}</svg></div>`;
 }
@@ -706,36 +780,48 @@ function normalizeCountryName(raw){
   if(raw.startsWith('Australia/')) return 'Australia';
   if(raw.startsWith('Canada/')) return 'Canada';
   const alias = {
-    'England':'United Kingdom', 'Scotland':'United Kingdom',
-    'Wales':'United Kingdom', 'Northern Ireland':'United Kingdom',
-    'Brasil':'Brazil', 'Czech Republic':'Czechia', 'Czechoslovakia':'Czechia',
-    'East-Germany':'Germany', 'Yugoslavia':'Serbia'
+    'England':'United Kingdom',
+    'Scotland':'United Kingdom',
+    'Wales':'United Kingdom',
+    'Northern Ireland':'United Kingdom',
+    'Brasil':'Brazil',
+    'Czech Republic':'Czechia',
+    'Czechoslovakia':'Czechia',
+    'East-Germany':'Germany',
+    'Yugoslavia':'Serbia'
   };
   return alias[raw] || raw;
 }
 
-// aggregate concerts by normalized (map-matchable) country name, and cities within
-const mapCountryCounts = new Map();      // topoName -> total concerts
-const mapCountryCityCounts = new Map();  // topoName -> Map(city -> count)
-CONCERTS.forEach(c=>{
+const mapCountryCounts = new Map();
+const mapCountryCityCounts = new Map();
+
+CORE_CONCERTS.forEach(c=>{
   const topoName = normalizeCountryName(c.country);
   if(!topoName) return;
   bump(mapCountryCounts, topoName);
-  if(!mapCountryCityCounts.has(topoName)) mapCountryCityCounts.set(topoName, new Map());
+  if(!mapCountryCityCounts.has(topoName)){
+    mapCountryCityCounts.set(topoName, new Map());
+  }
   if(c.city) bump(mapCountryCityCounts.get(topoName), c.city);
 });
 
 let mapInitialized = false;
-let mapGeojson = null, mapProjection = null, mapPathGen = null;
+let mapGeojson = null;
+let mapProjection = null;
+let mapPathGen = null;
 let mapSelectedFeature = null;
 const MAP_VB_W = 960, MAP_VB_H = 500;
 
 function initMapOnce(){
   if(mapInitialized) return;
+
   if(typeof d3==='undefined' || typeof topojson==='undefined'){
-    document.getElementById('map-loading').textContent = "La carte nécessite une connexion internet pour charger d3.js (bibliothèque de rendu géographique).";
+    document.getElementById('map-loading').textContent =
+      "La carte nécessite une connexion internet pour charger d3.js (bibliothèque de rendu géographique).";
     return;
   }
+
   const topoData = JSON.parse(document.getElementById('data-topo').textContent);
   mapGeojson = topojson.feature(topoData, topoData.objects.countries);
   mapProjection = d3.geoNaturalEarth1().fitSize([MAP_VB_W, MAP_VB_H], mapGeojson);
@@ -750,6 +836,7 @@ function colorScaleFor(){
   const land = style.getPropertyValue('--map-land').trim();
   const accent = style.getPropertyValue('--red-bright').trim();
   const maxCount = Math.max(...mapCountryCounts.values());
+
   return (name)=>{
     const count = mapCountryCounts.get(name);
     if(!count) return land;
@@ -761,14 +848,26 @@ function colorScaleFor(){
 function renderMap(){
   const colorFor = colorScaleFor();
   let pathsHtml = '';
+
   mapGeojson.features.forEach(f=>{
     const name = f.properties.name;
     const hasData = mapCountryCounts.has(name);
     const d = mapPathGen(f);
     if(!d) return;
+
     const fill = hasData ? colorFor(name) : null;
-    pathsHtml += `<path class="map-country ${hasData?'has-data':'no-data'}" data-name="${esc(name)}" d="${d}" ${fill?`style="fill:${fill}"`:''}><title>${esc(name)}${hasData?` — ${fmtInt(mapCountryCounts.get(name))} concert(s)`:''}</title></path>`;
+
+    pathsHtml += `
+      <path
+        class="map-country ${hasData?'has-data':'no-data'}"
+        data-name="${esc(name)}"
+        d="${d}"
+        ${fill?`style="fill:${fill}"`:''}>
+        <title>${esc(name)}${hasData?` — ${fmtInt(mapCountryCounts.get(name))} concert(s)`:''}</title>
+      </path>
+    `;
   });
+
   document.getElementById('map-svg-wrap').innerHTML =
     `<svg viewBox="0 0 ${MAP_VB_W} ${MAP_VB_H}"><g id="map-g">${pathsHtml}</g></svg>`;
 
@@ -784,20 +883,25 @@ function renderMap(){
 function selectMapCountry(feature){
   mapSelectedFeature = feature;
   const name = feature.properties.name;
+
   document.querySelectorAll('#map-svg-wrap .map-country').forEach(el=>{
     el.classList.toggle('selected', el.dataset.name===name);
   });
 
-  // zoom the <g> to the feature's bounding box
   const [[x0,y0],[x1,y1]] = mapPathGen.bounds(feature);
-  const bw = Math.max(1, x1-x0), bh = Math.max(1, y1-y0);
+  const bw = Math.max(1, x1-x0);
+  const bh = Math.max(1, y1-y0);
   const scale = Math.min(8, 0.85 / Math.max(bw/MAP_VB_W, bh/MAP_VB_H));
-  const cx = (x0+x1)/2, cy = (y0+y1)/2;
-  const tx = MAP_VB_W/2 - scale*cx, ty = MAP_VB_H/2 - scale*cy;
+  const cx = (x0+x1)/2;
+  const cy = (y0+y1)/2;
+  const tx = MAP_VB_W/2 - scale*cx;
+  const ty = MAP_VB_H/2 - scale*cy;
+
   const g = document.getElementById('map-g');
   g.style.transition = 'transform .5s cubic-bezier(.2,.7,.3,1)';
   g.style.transformOrigin = '0 0';
   g.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+
   document.querySelectorAll('#map-svg-wrap .map-country').forEach(el=>{
     el.style.strokeWidth = (0.5/scale)+'px';
   });
@@ -808,33 +912,41 @@ function selectMapCountry(feature){
 
 document.getElementById('map-reset').addEventListener('click', ()=>{
   mapSelectedFeature = null;
+
   const g = document.getElementById('map-g');
   if(g){
     g.style.transform = 'translate(0px,0px) scale(1)';
+
     document.querySelectorAll('#map-svg-wrap .map-country').forEach(el=>{
       el.classList.remove('selected');
       el.style.strokeWidth = '0.5px';
     });
   }
+
   document.getElementById('map-current').textContent = 'Vue : monde entier';
   renderMapSideDefault();
 });
 
 function renderMapSideDefault(){
   document.getElementById('map-side-title').textContent = 'Pays les plus visités';
+
   const entries = [...mapCountryCounts.entries()].sort((a,b)=>b[1]-a[1]);
   const max = entries.length ? entries[0][1] : 1;
   const el = document.getElementById('map-side-list');
+
   el.innerHTML = entries.map(([name,count],i)=>`
     <li class="rank-row clickable" data-country="${esc(name)}">
       <span class="rank-idx">${String(i+1).padStart(2,'0')}</span>
       <span class="rank-main">
         <span class="rank-name">${esc(name)}</span>
-        <span class="rank-bar-track"><span class="rank-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></span></span>
+        <span class="rank-bar-track">
+          <span class="rank-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></span>
+        </span>
       </span>
       <span class="rank-count">${fmtInt(count)}</span>
     </li>
   `).join('');
+
   el.querySelectorAll('.rank-row').forEach(row=>{
     row.addEventListener('click', ()=>{
       const name = row.dataset.country;
@@ -846,24 +958,31 @@ function renderMapSideDefault(){
 
 function renderMapSideForCountry(name){
   document.getElementById('map-side-title').textContent = `Villes — ${name}`;
+
   const cities = mapCountryCityCounts.get(name) || new Map();
   const entries = [...cities.entries()].sort((a,b)=>b[1]-a[1]);
   const el = document.getElementById('map-side-list');
+
   if(entries.length===0){
     el.innerHTML = `<div class="empty-state">Aucune ville identifiée pour ce pays.</div>`;
     return;
   }
+
   const max = entries[0][1];
+
   el.innerHTML = entries.map(([city,count],i)=>`
     <li class="rank-row clickable" data-city="${esc(city)}">
       <span class="rank-idx">${String(i+1).padStart(2,'0')}</span>
       <span class="rank-main">
         <span class="rank-name">${esc(city)}</span>
-        <span class="rank-bar-track"><span class="rank-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></span></span>
+        <span class="rank-bar-track">
+          <span class="rank-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></span>
+        </span>
       </span>
       <span class="rank-count">${fmtInt(count)}</span>
     </li>
   `).join('');
+
   el.querySelectorAll('.rank-row').forEach(row=>{
     row.addEventListener('click', ()=>{
       document.querySelector('button[data-tab="concerts"]').click();
@@ -873,11 +992,12 @@ function renderMapSideForCountry(name){
   });
 }
 
-// init the map lazily, the first time the tab is opened (avoids upfront cost / CDN dependency issues)
 document.querySelector('button[data-tab="map"]').addEventListener('click', initMapOnce);
 
-// keep map colors in sync with the active theme
 document.getElementById('theme-toggle').addEventListener('click', ()=>{
   if(mapInitialized) renderMap();
 });
-
+  } else if(scope==='city' && city){
+    scopeConcerts = CORE_CONCERTS.filter(c=>c.city===city);
+    scopeLabel = `à ${city}`;
+  }
