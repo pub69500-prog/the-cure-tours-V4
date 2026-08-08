@@ -14,13 +14,20 @@ from common import load, save, log_change, now, normalize
 
 
 BASE = "https://www.cure-concerts.de"
-UA = "STATICURE-archive-sync/4.6 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
+
+UA = (
+    "STATICURE-archive-sync/4.7 "
+    "(+https://github.com/pub69500-prog/the-cure-tours-V4)"
+)
+
 
 TITLE_RE = re.compile(
     r"^(?P<artist>.*?)\s+"
     r"(?P<date>\d{4}-(?:\d{2}|xx)-(?:\d{2}|xx))\s+"
-    r"(?P<city>.+?)\s+-\s+(?P<venue>.+?)\s+\((?P<country>[^)]+)\)"
+    r"(?P<city>.+?)\s+-\s+"
+    r"(?P<venue>.+?)\s+\((?P<country>[^)]+)\)"
 )
+
 
 LABELS = {
     "Songs played": "songsPlayed",
@@ -33,26 +40,38 @@ LABELS = {
     "Address": "venueAddress",
 }
 
-# Artistes considérés comme faisant partie de l'historique
-# principal de The Cure.
+
+# ================================================================
+# ARTISTES / PROJETS CONSIDÉRÉS COMME HISTOIRE PRINCIPALE CURE
+# ================================================================
+
 CORE_ARTISTS = {
-    "the cure",
-    "easy cure",
-    "malice",
+    "the cure": "The Cure",
+    "easy cure": "Easy Cure",
+    "malice": "Malice",
 }
+
 
 _ROBOTS = None
 _ROBOTS_READY = False
 
 
+# ================================================================
+# LOGS
+# ================================================================
+
 def _log(*args):
     print(*args, flush=True)
 
 
+# ================================================================
+# ROBOTS.TXT
+# ================================================================
+
 def _respect_robots():
     return os.getenv(
         "CUREGUIDE_RESPECT_ROBOTS",
-        "true"
+        "true",
     ).lower() not in {
         "0",
         "false",
@@ -61,7 +80,12 @@ def _respect_robots():
 
 
 def _load_robots_once():
-    global _ROBOTS, _ROBOTS_READY
+    """
+    Charge robots.txt une seule fois par exécution.
+    """
+
+    global _ROBOTS
+    global _ROBOTS_READY
 
     if _ROBOTS_READY:
         return _ROBOTS
@@ -91,14 +115,17 @@ def _load_robots_once():
 
         with urllib.request.urlopen(
             req,
-            timeout=8
+            timeout=8,
         ) as response:
+
             body = response.read().decode(
                 "utf-8",
-                "replace"
+                "replace",
             )
 
-        rp.parse(body.splitlines())
+        rp.parse(
+            body.splitlines()
+        )
 
         _ROBOTS = rp
 
@@ -107,6 +134,7 @@ def _load_robots_once():
         )
 
     except Exception as exc:
+
         _ROBOTS = None
 
         _log(
@@ -119,19 +147,27 @@ def _load_robots_once():
 
 
 def allowed(url):
+
     if not _respect_robots():
         return True
 
     rp = _load_robots_once()
 
-    return (
-        True
-        if rp is None
-        else rp.can_fetch(UA, url)
+    if rp is None:
+        return True
+
+    return rp.can_fetch(
+        UA,
+        url,
     )
 
 
+# ================================================================
+# HTTP
+# ================================================================
+
 def fetch(url):
+
     if not allowed(url):
         raise RuntimeError(
             f"robots.txt interdit {url}"
@@ -150,22 +186,26 @@ def fetch(url):
 
     with urllib.request.urlopen(
         req,
-        timeout=20
+        timeout=20,
     ) as response:
+
         return response.read().decode(
             "utf-8",
-            "replace"
+            "replace",
         )
 
 
+# ================================================================
+# CONFIRMATION — PAGES INDEX / UPDATES
+# ================================================================
+
 def _inline_confirmation_hint(anchor):
     """
-    Déduit prudemment le statut de confirmation
-    depuis les informations HTML explicites
-    présentes sur les pages année / updates.
+    Cherche un indice HTML explicite de confirmation
+    sur les pages annuelles / updates.
 
-    Si aucun indice suffisamment fiable n'est
-    présent, retourne Unknown.
+    Si rien n'est suffisamment fiable :
+    Unknown.
     """
 
     bits = []
@@ -173,6 +213,7 @@ def _inline_confirmation_hint(anchor):
     node = anchor
 
     for _ in range(4):
+
         if node is None:
             break
 
@@ -186,7 +227,9 @@ def _inline_confirmation_hint(anchor):
 
         node = node.parent
 
-    blob = " ".join(bits).lower()
+    blob = " ".join(
+        bits
+    ).lower()
 
     if any(
         x in blob
@@ -206,9 +249,6 @@ def _inline_confirmation_hint(anchor):
     ):
         return "Confirmed"
 
-    # On accepte uniquement les couleurs
-    # explicitement présentes dans le HTML.
-
     if re.search(
         r"color\s*:\s*"
         r"(?:grey|gray|#(?:777|888|999|aaa|bbb)\b)",
@@ -226,7 +266,12 @@ def _inline_confirmation_hint(anchor):
     return "Unknown"
 
 
+# ================================================================
+# LISTE DES PAGES À CONTRÔLER
+# ================================================================
+
 def candidates():
+
     year = dt.datetime.now().year
 
     pages = [
@@ -244,44 +289,49 @@ def candidates():
         )
 
         try:
+
             soup = BeautifulSoup(
                 fetch(page),
-                "html.parser"
+                "html.parser",
             )
 
             for a in soup.find_all(
                 "a",
-                href=True
+                href=True,
             ):
+
                 url = urllib.parse.urljoin(
                     page,
-                    a["href"]
+                    a["href"],
                 )
 
-                if re.search(
+                if not re.search(
                     r"/concerts/"
                     r"\d{4}-(?:\d{2}|xx)-"
                     r"(?:\d{2}|xx)\.php$",
                     url,
                 ):
-                    hint = (
-                        _inline_confirmation_hint(a)
-                    )
+                    continue
 
-                    previous = found.get(
-                        url,
-                        "Unknown"
-                    )
+                hint = (
+                    _inline_confirmation_hint(a)
+                )
 
-                    # Ne jamais remplacer un statut
-                    # explicite par Unknown.
-                    found[url] = (
-                        hint
-                        if hint != "Unknown"
-                        else previous
-                    )
+                previous = found.get(
+                    url,
+                    "Unknown",
+                )
+
+                # Ne remplace pas une information explicite
+                # par Unknown.
+                found[url] = (
+                    hint
+                    if hint != "Unknown"
+                    else previous
+                )
 
         except Exception as exc:
+
             _log(
                 "[cureguide] ERROR scanning "
                 f"{page}: {exc}"
@@ -295,15 +345,15 @@ def candidates():
     ]
 
 
+# ================================================================
+# MARQUEURS HTML DE CONFIRMATION
+# ================================================================
+
 def _all_marker_text(soup):
     """
-    Cure Concerts Guide utilise notamment
-    des images avec des labels comme
-    'setlist unknown'.
-
-    BeautifulSoup.get_text() n'inclut pas
-    les attributs alt des images, donc
-    on les inspecte séparément.
+    get_text() n'inclut pas les attributs alt/title.
+    Le Guide utilise notamment des images contenant
+    des indications du type "setlist unknown".
     """
 
     parts = []
@@ -314,6 +364,7 @@ def _all_marker_text(soup):
             "alt",
             "title",
         ):
+
             value = img.get(attr)
 
             if value:
@@ -330,28 +381,29 @@ def _all_marker_text(soup):
                 str(title)
             )
 
-    return " ".join(parts).lower()
+    return " ".join(
+        parts
+    ).lower()
 
 
 def _confirmation_status(
     soup,
     text,
-    songs_played
+    songs_played,
 ):
     """
-    Conserve séparément :
-      - confirmation du concert
-      - confirmation de la setlist
+    Les deux statuts sont indépendants :
 
-    Règle Cure Concerts Guide :
-      - setlists blanches = confirmées
-      - setlists grises = non confirmées
+      concertConfirmation
+      setlistConfirmation
 
-    Si aucun marqueur suffisamment fiable
-    n'est présent, le statut reste Unknown.
+    Un concert peut donc être connu alors que sa
+    setlist reste non confirmée.
     """
 
-    markers = _all_marker_text(soup)
+    markers = _all_marker_text(
+        soup
+    )
 
     combined = (
         markers
@@ -369,11 +421,16 @@ def _confirmation_status(
         )
     )
 
+    # ------------------------------------------------------------
+    # SETLIST
+    # ------------------------------------------------------------
+
     if (
         "setlist unknown" in combined
         or
         "setlist unconfirmed" in combined
     ):
+
         setlist_confirmation = (
             "Unconfirmed"
             if has_named_setlist
@@ -384,22 +441,27 @@ def _confirmation_status(
         "setlist confirmed"
         in combined
     ):
+
         setlist_confirmation = (
             "Confirmed"
         )
 
     else:
-        # L'absence de marqueur ne suffit pas
-        # pour déclarer la setlist confirmée.
+
         setlist_confirmation = (
             "Unknown"
         )
+
+    # ------------------------------------------------------------
+    # CONCERT
+    # ------------------------------------------------------------
 
     if (
         "concert unconfirmed" in combined
         or
         "concert unknown" in combined
     ):
+
         concert_confirmation = (
             "Unconfirmed"
         )
@@ -408,82 +470,207 @@ def _confirmation_status(
         "concert confirmed"
         in combined
     ):
+
         concert_confirmation = (
             "Confirmed"
         )
 
     else:
+
         concert_confirmation = (
             "Unknown"
         )
 
     return (
         concert_confirmation,
-        setlist_confirmation
+        setlist_confirmation,
     )
 
 
-def _classify_artist(artist):
+# ================================================================
+# CLASSIFICATION ARTISTE / ÉVÉNEMENT — V4.7
+# ================================================================
+
+def _normalize_artist(value):
+
+    return (
+        str(value or "The Cure")
+        .strip()
+        .rstrip(":")
+        .strip()
+        .lower()
+    )
+
+
+def _classify_artist(
+    artist,
+    page_title="",
+):
     """
-    V4.6
+    V4.7
 
-    Détermine si l'événement est un concert
-    principal Cure ou une apparition chez
-    un autre artiste.
+    Correction du problème V4.6 :
 
-    Exemple :
-      artist = "The Cure"
-        -> Concert
+        "The Cure live concert"
 
-      artist = "Olivia Rodrigo"
-        -> Guest appearance
+    ne doit évidemment PAS devenir une apparition.
 
-    Les apparitions restent dans l'archive,
-    mais seront exclues des statistiques
-    principales par build_site.py.
+    On considère donc comme concerts Cure :
+
+      The Cure
+      The Cure live concert
+      Easy Cure
+      Easy Cure live concert
+      Malice
+      Malice live concert
+
+    Une Guest appearance n'est utilisée que lorsque
+    l'artiste principal est réellement extérieur.
     """
 
-    cleaned = (
+    raw_artist = (
         str(artist or "The Cure")
         .strip()
         .rstrip(":")
         .strip()
     )
 
-    normalized = cleaned.lower()
-
-    is_core = (
-        normalized in CORE_ARTISTS
+    artist_norm = (
+        _normalize_artist(
+            raw_artist
+        )
     )
 
-    if is_core:
-        event_type = "Concert"
-    else:
-        event_type = (
-            "Guest appearance"
+    # ------------------------------------------------------------
+    # THE CURE
+    # ------------------------------------------------------------
+
+    if (
+        artist_norm == "the cure"
+        or
+        artist_norm.startswith(
+            "the cure "
+        )
+    ):
+
+        return (
+            "The Cure",
+            True,
+            "Concert",
         )
 
-    return (
-        cleaned,
-        is_core,
-        event_type,
+    # ------------------------------------------------------------
+    # EASY CURE
+    # ------------------------------------------------------------
+
+    if (
+        artist_norm == "easy cure"
+        or
+        artist_norm.startswith(
+            "easy cure "
+        )
+    ):
+
+        return (
+            "Easy Cure",
+            True,
+            "Concert",
+        )
+
+    # ------------------------------------------------------------
+    # MALICE
+    # ------------------------------------------------------------
+
+    if (
+        artist_norm == "malice"
+        or
+        artist_norm.startswith(
+            "malice "
+        )
+    ):
+
+        return (
+            "Malice",
+            True,
+            "Concert",
+        )
+
+    # ------------------------------------------------------------
+    # SÉCURITÉ : TITRE DE PAGE
+    #
+    # Permet notamment de corriger automatiquement certaines
+    # anciennes données mal parsées par la V4.6.
+    # ------------------------------------------------------------
+
+    title_norm = (
+        str(page_title or "")
+        .strip()
+        .lower()
     )
 
+    if (
+        "the cure live concert"
+        in title_norm
+    ):
+
+        return (
+            "The Cure",
+            True,
+            "Concert",
+        )
+
+    if (
+        "easy cure live concert"
+        in title_norm
+    ):
+
+        return (
+            "Easy Cure",
+            True,
+            "Concert",
+        )
+
+    if (
+        "malice live concert"
+        in title_norm
+    ):
+
+        return (
+            "Malice",
+            True,
+            "Concert",
+        )
+
+    # ------------------------------------------------------------
+    # ARTISTE EXTÉRIEUR
+    # ------------------------------------------------------------
+
+    return (
+        raw_artist or "Unknown",
+        False,
+        "Guest appearance",
+    )
+
+
+# ================================================================
+# PARSING D'UNE PAGE CONCERT
+# ================================================================
 
 def parse(
     url,
     html,
-    concert_hint="Unknown"
+    concert_hint="Unknown",
 ):
+
     soup = BeautifulSoup(
         html,
-        "html.parser"
+        "html.parser",
     )
 
     title = (
         soup.title.get_text(
             " ",
-            strip=True
+            strip=True,
         )
         if soup.title
         else ""
@@ -499,7 +686,8 @@ def parse(
 
     m = (
         TITLE_RE.search(title)
-        or TITLE_RE.search(text)
+        or
+        TITLE_RE.search(text)
     )
 
     date_match = re.search(
@@ -509,33 +697,50 @@ def parse(
     )
 
     if not date_match:
+
         raise ValueError(
             "date introuvable "
             f"dans l'URL: {url}"
         )
 
-    date = date_match.group(1)
+    date = (
+        date_match.group(1)
+    )
 
     out = {
-        "id": None,
-        "date": date,
-        "year": int(date[:4]),
-        "sourceUrl": url,
-        "scrapedAt": now(),
-        "pageTitle": title,
+        "id":
+            None,
+
+        "date":
+            date,
+
+        "year":
+            int(date[:4]),
+
+        "sourceUrl":
+            url,
+
+        "scrapedAt":
+            now(),
+
+        "pageTitle":
+            title,
+
         "sources": {
             "primary":
                 "cure-concerts.de"
         },
+
         "confirmationSource":
             "cure-concerts.de",
     }
 
-    # ----------------------------------------------------------
+    # ------------------------------------------------------------
     # ARTISTE / VILLE / SALLE / PAYS
-    # ----------------------------------------------------------
+    # ------------------------------------------------------------
 
     if m:
+
         out.update(
             {
                 "artist":
@@ -546,27 +751,35 @@ def parse(
                     or "The Cure",
 
                 "city":
-                    m["city"].strip(),
+                    m["city"]
+                    .strip(),
 
                 "venue":
-                    m["venue"].strip(),
+                    m["venue"]
+                    .strip(),
 
                 "country":
-                    m["country"].strip(),
+                    m["country"]
+                    .strip(),
             }
         )
 
-    # ----------------------------------------------------------
-    # V4.6 — CLASSIFICATION
-    # ----------------------------------------------------------
+    # ------------------------------------------------------------
+    # CLASSIFICATION V4.7
+    # ------------------------------------------------------------
 
-    artist, is_core, event_type = (
-        _classify_artist(
-            out.get("artist")
-        )
+    (
+        artist,
+        is_core,
+        event_type,
+    ) = _classify_artist(
+        out.get("artist"),
+        title,
     )
 
-    out["artist"] = artist
+    out["artist"] = (
+        artist
+    )
 
     out["isTheCureConcert"] = (
         is_core
@@ -580,13 +793,17 @@ def parse(
         event_type
     )
 
-    # ----------------------------------------------------------
-    # DONNÉES DU CONCERT
-    # ----------------------------------------------------------
+    # ------------------------------------------------------------
+    # INFORMATIONS DU CONCERT
+    # ------------------------------------------------------------
 
-    lines = text.splitlines()
+    lines = (
+        text.splitlines()
+    )
 
-    for i, line in enumerate(lines):
+    for i, line in enumerate(
+        lines
+    ):
 
         for label, key in (
             LABELS.items()
@@ -594,46 +811,53 @@ def parse(
 
             if (
                 line.rstrip(":").lower()
-                == label.lower()
-                and i + 1 < len(lines)
+                != label.lower()
             ):
-                value = (
-                    lines[i + 1]
+                continue
+
+            if (
+                i + 1
+                >= len(lines)
+            ):
+                continue
+
+            value = (
+                lines[i + 1]
+            )
+
+            if key in {
+                "songsPlayed",
+                "attendance",
+                "concertCapacity",
+                "setLengthMin",
+            }:
+
+                # Il faut obligatoirement au moins
+                # un chiffre avant conversion.
+                #
+                # Évite notamment int('').
+                number = re.search(
+                    r"\d[\d,']*",
+                    value,
                 )
 
-                if key in {
-                    "songsPlayed",
-                    "attendance",
-                    "concertCapacity",
-                    "setLengthMin",
-                }:
+                if not number:
+                    continue
 
-                    # Le champ doit contenir
-                    # au moins un chiffre.
-                    #
-                    # Cela évite notamment :
-                    # int('')
-                    number = re.search(
-                        r"\d[\d,']*",
-                        value
-                    )
+                value = int(
+                    number
+                    .group(0)
+                    .replace(",", "")
+                    .replace("'", "")
+                )
 
-                    if number:
-                        value = int(
-                            number
-                            .group(0)
-                            .replace(",", "")
-                            .replace("'", "")
-                        )
+            out[key] = (
+                value
+            )
 
-                    else:
-                        continue
-
-                out[key] = value
-
-    # ----------------------------------------------------------
+    # ------------------------------------------------------------
     # CONFIRMATION
-    # ----------------------------------------------------------
+    # ------------------------------------------------------------
 
     (
         page_concert_status,
@@ -641,51 +865,56 @@ def parse(
     ) = _confirmation_status(
         soup,
         text,
-        out.get("songsPlayed")
+        out.get(
+            "songsPlayed"
+        ),
     )
 
-    # Un statut explicite trouvé sur la page
-    # du concert est prioritaire.
-    #
-    # Sinon on utilise l'indice éventuel
-    # trouvé sur la page année / updates.
-
-    out["concertConfirmation"] = (
+    out[
+        "concertConfirmation"
+    ] = (
         page_concert_status
         if page_concert_status
         != "Unknown"
         else concert_hint
     )
 
-    out["setlistConfirmation"] = (
+    out[
+        "setlistConfirmation"
+    ] = (
         setlist_status
     )
 
-    # Compatibilité avec l'interface
-    # actuelle.
-    out["setlistStatus"] = (
+    # Compatibilité frontend / anciennes données
+    out[
+        "setlistStatus"
+    ] = (
         setlist_status
     )
 
     return out
 
 
+# ================================================================
+# SYNCHRONISATION
+# ================================================================
+
 def main():
 
     _log(
-        "[cureguide] sync V4.6 started"
+        "[cureguide] sync V4.7 started"
     )
 
     _load_robots_once()
 
     concerts = load(
         "concerts.json",
-        []
+        [],
     )
 
     changes = load(
         "changelog.json",
-        []
+        [],
     )
 
     byid = {
@@ -706,12 +935,16 @@ def main():
         f"{len(items)} candidate pages"
     )
 
+    # ============================================================
+    # TRAITEMENT DES PAGES
+    # ============================================================
+
     for index, (
         url,
-        concert_hint
+        concert_hint,
     ) in enumerate(
         items,
-        1
+        1,
     ):
 
         _log(
@@ -721,13 +954,15 @@ def main():
         )
 
         try:
+
             patch = parse(
                 url,
                 fetch(url),
-                concert_hint
+                concert_hint,
             )
 
         except Exception as exc:
+
             _log(
                 "[cureguide] skip "
                 f"{url}: {exc}"
@@ -735,11 +970,13 @@ def main():
 
             continue
 
-        old = byurl.get(url)
+        old = (
+            byurl.get(url)
+        )
 
-        # ------------------------------------------------------
-        # Recherche d'un concert déjà existant
-        # ------------------------------------------------------
+        # --------------------------------------------------------
+        # RECHERCHE D'UNE ENTRÉE EXISTANTE
+        # --------------------------------------------------------
 
         if old is None:
 
@@ -751,17 +988,21 @@ def main():
                     c.get("date")
                     == patch["date"]
 
-                    and normalize(
+                    and
+                    normalize(
                         c.get("city")
                     )
-                    == normalize(
+                    ==
+                    normalize(
                         patch.get("city")
                     )
 
-                    and normalize(
+                    and
+                    normalize(
                         c.get("venue")
                     )
-                    == normalize(
+                    ==
+                    normalize(
                         patch.get("venue")
                     )
                 )
@@ -773,9 +1014,9 @@ def main():
                 else None
             )
 
-        # ------------------------------------------------------
+        # --------------------------------------------------------
         # NOUVEL ÉVÉNEMENT
-        # ------------------------------------------------------
+        # --------------------------------------------------------
 
         if old is None:
 
@@ -791,6 +1032,7 @@ def main():
             duplicate = 2
 
             while cid in byid:
+
                 cid = (
                     f"{base}:"
                     f"{duplicate}"
@@ -798,11 +1040,17 @@ def main():
 
                 duplicate += 1
 
-            patch["id"] = cid
+            patch["id"] = (
+                cid
+            )
 
-            byid[cid] = patch
+            byid[cid] = (
+                patch
+            )
 
-            byurl[url] = patch
+            byurl[url] = (
+                patch
+            )
 
             log_change(
                 changes,
@@ -815,9 +1063,9 @@ def main():
                 "NEW_EVENT",
             )
 
-        # ------------------------------------------------------
-        # MISE À JOUR D'UN ÉVÉNEMENT EXISTANT
-        # ------------------------------------------------------
+        # --------------------------------------------------------
+        # ÉVÉNEMENT EXISTANT
+        # --------------------------------------------------------
 
         else:
 
@@ -830,20 +1078,25 @@ def main():
                         "id",
                         "sources",
                     }
-                    or value in (
+                    or
+                    value in {
                         None,
                         "",
-                    )
+                    }
                 ):
                     continue
 
+                # scrapedAt est mis à jour
+                # sans créer de changelog.
                 if key == "scrapedAt":
+
                     old[key] = value
+
                     continue
 
-                # Ne jamais remplacer un statut
-                # Confirmed / Unconfirmed existant
-                # par Unknown.
+                # ------------------------------------------------
+                # PROTECTION DES STATUTS DE CONFIRMATION
+                # ------------------------------------------------
 
                 if (
                     key in {
@@ -852,10 +1105,11 @@ def main():
                         "setlistStatus",
                     }
 
-                    and value
-                    == "Unknown"
+                    and
+                    value == "Unknown"
 
-                    and old.get(key)
+                    and
+                    old.get(key)
                     in {
                         "Confirmed",
                         "Unconfirmed",
@@ -863,53 +1117,63 @@ def main():
                 ):
                     continue
 
-                if old.get(key) != value:
+                if (
+                    old.get(key)
+                    == value
+                ):
+                    continue
 
-                    # Les changements de classification
-                    # sont eux aussi considérés comme des
-                    # changements de statut.
+                # ------------------------------------------------
+                # TYPE DE CHANGEMENT
+                # ------------------------------------------------
 
-                    if key in {
-                        "concertConfirmation",
-                        "setlistConfirmation",
-                        "setlistStatus",
-                        "eventType",
-                        "isTheCureConcert",
-                        "guestAppearance",
-                    }:
-                        change_type = (
-                            "STATUS_CHANGE"
-                        )
+                if key in {
+                    "concertConfirmation",
+                    "setlistConfirmation",
+                    "setlistStatus",
+                    "eventType",
+                    "isTheCureConcert",
+                    "guestAppearance",
+                    "artist",
+                }:
 
-                    elif (
-                        old["year"]
-                        < dt.datetime.now().year
-                    ):
-                        change_type = (
-                            "HISTORICAL_CORRECTION"
-                        )
-
-                    else:
-                        change_type = (
-                            "UPDATED_EVENT"
-                        )
-
-                    log_change(
-                        changes,
-                        old["id"],
-                        old["date"],
-                        key,
-                        old.get(key),
-                        value,
-                        url,
-                        change_type,
+                    change_type = (
+                        "STATUS_CHANGE"
                     )
 
-                    old[key] = value
+                elif (
+                    old.get("year")
+                    and
+                    old["year"]
+                    < dt.datetime.now().year
+                ):
+
+                    change_type = (
+                        "HISTORICAL_CORRECTION"
+                    )
+
+                else:
+
+                    change_type = (
+                        "UPDATED_EVENT"
+                    )
+
+                log_change(
+                    changes,
+                    old["id"],
+                    old["date"],
+                    key,
+                    old.get(key),
+                    value,
+                    url,
+                    change_type,
+                )
+
+                old[key] = value
 
             old.setdefault(
                 "sources",
-                {}
+                {},
             )["primary"] = (
                 "cure-concerts.de"
             )
@@ -920,50 +1184,57 @@ def main():
                 "cure-concerts.de"
             )
 
+        # Petite pause pour ne pas marteler le serveur.
         time.sleep(0.8)
 
-    # ----------------------------------------------------------
+    # ============================================================
     # SAUVEGARDE
-    # ----------------------------------------------------------
+    # ============================================================
 
     save(
         "concerts.json",
         sorted(
             byid.values(),
             key=lambda concert:
-                concert["date"]
+                concert["date"],
         ),
     )
 
     save(
         "changelog.json",
-        changes[-5000:]
+        changes[-5000:],
     )
 
     state = load(
         "state.json",
-        {}
+        {},
     )
 
     state[
         "cureGuideLastSync"
-    ] = now()
+    ] = (
+        now()
+    )
 
     state[
         "cureGuideCandidates"
-    ] = len(items)
+    ] = (
+        len(items)
+    )
 
     state[
         "cureGuideVersion"
-    ] = "4.6"
+    ] = (
+        "4.7"
+    )
 
     save(
         "state.json",
-        state
+        state,
     )
 
     _log(
-        "[cureguide] sync V4.6 completed"
+        "[cureguide] sync V4.7 completed"
     )
 
 
