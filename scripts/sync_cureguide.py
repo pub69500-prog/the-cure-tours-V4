@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from common import load, save, log_change, now, normalize
 
 BASE = "https://www.cure-concerts.de"
-UA = "STATICURE-archive-sync/4.2 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
+UA = "STATICURE-archive-sync/4.4 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
 
 TITLE_RE = re.compile(
     r"^(?P<artist>.*?)\s+"
@@ -47,12 +47,9 @@ def _respect_robots():
 
 
 def _load_robots_once():
-    """Charge robots.txt UNE seule fois par exécution, avec timeout."""
     global _ROBOTS, _ROBOTS_READY
-
     if _ROBOTS_READY:
         return _ROBOTS
-
     _ROBOTS_READY = True
 
     if not _respect_robots():
@@ -74,8 +71,6 @@ def _load_robots_once():
         _ROBOTS = rp
         _log("[cureguide] robots.txt loaded once")
     except Exception as exc:
-        # Même comportement de repli que la V4 initiale : ne pas rester bloqué
-        # si robots.txt est temporairement indisponible.
         _ROBOTS = None
         _log(f"[cureguide] WARNING: robots.txt unavailable ({exc}); continuing")
 
@@ -105,6 +100,36 @@ def fetch(url):
         return response.read().decode("utf-8", "replace")
 
 
+def _inline_confirmation_hint(anchor):
+    """
+    Conservatively infer a concert confirmation status from explicit HTML hints
+    on year/update links. If the site does not expose a clear hint, return Unknown.
+    """
+    bits = []
+    node = anchor
+    for _ in range(4):
+        if node is None:
+            break
+        bits += list(node.get("class") or [])
+        bits.append(node.get("style") or "")
+        node = node.parent
+
+    blob = " ".join(bits).lower()
+
+    if any(x in blob for x in ("unconfirmed", "notconfirmed", "unknown", " grey", " gray")):
+        return "Unconfirmed"
+    if "confirmed" in blob and "unconfirmed" not in blob:
+        return "Confirmed"
+
+    # Only accept very explicit inline grey/white colors.
+    if re.search(r"color\s*:\s*(?:grey|gray|#(?:777|888|999|aaa|bbb)\b)", blob):
+        return "Unconfirmed"
+    if re.search(r"color\s*:\s*(?:white|#fff(?:fff)?\b)", blob):
+        return "Confirmed"
+
+    return "Unknown"
+
+
 def candidates():
     year = dt.datetime.now().year
     pages = [
@@ -113,7 +138,7 @@ def candidates():
         f"{BASE}/main/{year - 1}.php",
     ]
 
-    urls = set()
+    found = {}
 
     for page in pages:
         _log(f"[cureguide] scanning {page}")
@@ -125,16 +150,78 @@ def candidates():
                     r"/concerts/\d{4}-(?:\d{2}|xx)-(?:\d{2}|xx)\.php$",
                     url,
                 ):
-                    urls.add(url)
+                    hint = _inline_confirmation_hint(a)
+                    previous = found.get(url, "Unknown")
+                    # Never downgrade an explicit status to Unknown.
+                    found[url] = hint if hint != "Unknown" else previous
         except Exception as exc:
             _log(f"[cureguide] ERROR scanning {page}: {exc}")
 
         time.sleep(0.8)
 
-    return sorted(urls)
+    return [(url, found[url]) for url in sorted(found)]
 
 
-def parse(url, html):
+def _all_marker_text(soup):
+    """
+    Cure Concerts Guide uses image labels such as 'setlist unknown'.
+    BeautifulSoup.get_text() does not include <img alt>, so inspect attributes too.
+    """
+    parts = []
+
+    for img in soup.find_all("img"):
+        for attr in ("alt", "title"):
+            value = img.get(attr)
+            if value:
+                parts.append(str(value))
+
+    for tag in soup.find_all(True):
+        title = tag.get("title")
+        if title:
+            parts.append(str(title))
+
+    return " ".join(parts).lower()
+
+
+def _confirmation_status(soup, text, songs_played):
+    """
+    Keep the site's confirmation semantics separate from mere setlist availability.
+
+    Official Cure Concerts Guide rule:
+      - white setlists = confirmed
+      - grey setlists/concerts = not confirmed
+
+    The page also exposes an image/label 'setlist unknown' on unconfirmed setlists.
+    We use that explicit marker when present. If no reliable marker is exposed,
+    we do NOT invent a confirmation status.
+    """
+    markers = _all_marker_text(soup)
+    combined = (markers + " " + text.lower())
+
+    has_named_setlist = bool(
+        songs_played
+        or re.search(r"(?im)^\s*(?:mainset|encore\s*\d*|set\s*\d*)\s*:", text)
+    )
+
+    if "setlist unknown" in combined or "setlist unconfirmed" in combined:
+        setlist_confirmation = "Unconfirmed" if has_named_setlist else "Unknown"
+    elif "setlist confirmed" in combined:
+        setlist_confirmation = "Confirmed"
+    else:
+        # Important: absence of the marker alone is not enough to claim confirmation.
+        setlist_confirmation = "Unknown"
+
+    if "concert unconfirmed" in combined or "concert unknown" in combined:
+        concert_confirmation = "Unconfirmed"
+    elif "concert confirmed" in combined:
+        concert_confirmation = "Confirmed"
+    else:
+        concert_confirmation = "Unknown"
+
+    return concert_confirmation, setlist_confirmation
+
+
+def parse(url, html, concert_hint="Unknown"):
     soup = BeautifulSoup(html, "html.parser")
     title = soup.title.get_text(" ", strip=True) if soup.title else ""
     text = "\n".join(
@@ -159,6 +246,7 @@ def parse(url, html):
         "scrapedAt": now(),
         "pageTitle": title,
         "sources": {"primary": "cure-concerts.de"},
+        "confirmationSource": "cure-concerts.de",
     }
 
     if m:
@@ -184,17 +272,39 @@ def parse(url, html):
                     "concertCapacity",
                     "setLengthMin",
                 }:
-                    number = re.search(r"\d[\d,]*", value)
+                    # Must contain at least one digit; avoids int('') on punctuation.
+                    number = re.search(r"\d[\d,']*", value)
                     if number:
-                        value = int(number.group(0).replace(",", ""))
+                        value = int(
+                            number.group(0)
+                            .replace(",", "")
+                            .replace("'", "")
+                        )
+                    else:
+                        continue
 
                 out[key] = value
+
+    page_concert_status, setlist_status = _confirmation_status(
+        soup, text, out.get("songsPlayed")
+    )
+
+    # Prefer an explicit page status; otherwise use an explicit year/update-page hint.
+    out["concertConfirmation"] = (
+        page_concert_status
+        if page_concert_status != "Unknown"
+        else concert_hint
+    )
+    out["setlistConfirmation"] = setlist_status
+
+    # Backward-compatible field used by the current UI filter.
+    out["setlistStatus"] = setlist_status
 
     return out
 
 
 def main():
-    _log("[cureguide] sync started")
+    _log("[cureguide] sync V4.4 started")
     _load_robots_once()
 
     concerts = load("concerts.json", [])
@@ -207,14 +317,14 @@ def main():
         if c.get("sourceUrl")
     }
 
-    urls = candidates()
-    _log(f"[cureguide] {len(urls)} candidate pages")
+    items = candidates()
+    _log(f"[cureguide] {len(items)} candidate pages")
 
-    for index, url in enumerate(urls, 1):
-        _log(f"[cureguide] {index}/{len(urls)} {url}")
+    for index, (url, concert_hint) in enumerate(items, 1):
+        _log(f"[cureguide] {index}/{len(items)} {url}")
 
         try:
-            patch = parse(url, fetch(url))
+            patch = parse(url, fetch(url), concert_hint)
         except Exception as exc:
             _log(f"[cureguide] skip {url}: {exc}")
             continue
@@ -268,7 +378,29 @@ def main():
                     old[key] = value
                     continue
 
+                # Do not replace an explicit confirmation with Unknown.
+                if (
+                    key in {"concertConfirmation", "setlistConfirmation", "setlistStatus"}
+                    and value == "Unknown"
+                    and old.get(key) in {"Confirmed", "Unconfirmed"}
+                ):
+                    continue
+
                 if old.get(key) != value:
+                    change_type = (
+                        "STATUS_CHANGE"
+                        if key in {
+                            "concertConfirmation",
+                            "setlistConfirmation",
+                            "setlistStatus",
+                        }
+                        else (
+                            "HISTORICAL_CORRECTION"
+                            if old["year"] < dt.datetime.now().year
+                            else "UPDATED_EVENT"
+                        )
+                    )
+
                     log_change(
                         changes,
                         old["id"],
@@ -277,13 +409,12 @@ def main():
                         old.get(key),
                         value,
                         url,
-                        "HISTORICAL_CORRECTION"
-                        if old["year"] < dt.datetime.now().year
-                        else "UPDATED_EVENT",
+                        change_type,
                     )
                     old[key] = value
 
             old.setdefault("sources", {})["primary"] = "cure-concerts.de"
+            old["confirmationSource"] = "cure-concerts.de"
 
         time.sleep(0.8)
 
@@ -295,10 +426,11 @@ def main():
 
     state = load("state.json", {})
     state["cureGuideLastSync"] = now()
-    state["cureGuideCandidates"] = len(urls)
+    state["cureGuideCandidates"] = len(items)
+    state["cureGuideVersion"] = "4.4"
     save("state.json", state)
 
-    _log("[cureguide] sync completed")
+    _log("[cureguide] sync V4.4 completed")
 
 
 if __name__ == "__main__":
