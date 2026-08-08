@@ -93,7 +93,7 @@ jobs:
 
             echo "Synchronizing with latest main..."
             git fetch origin main
-            git rebase origin/main
+            git rebase --autostash origin/main
 
             git push origin HEAD:main
           fi
