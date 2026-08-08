@@ -1,60 +1,105 @@
-name: Synchroniser les archives et publier
+name: Build and deploy STATICURE
+
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - main
+
   schedule:
-    - cron: '17 4 * * *'
+    # Synchronisation quotidienne à 04:17 UTC
+    - cron: "17 4 * * *"
+
+  workflow_dispatch:
+    inputs:
+      skip_cureguide:
+        description: "Skip Cure Concerts Guide sync"
+        required: false
+        default: false
+        type: boolean
+
 permissions:
   contents: write
   pages: write
   id-token: write
+
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: pip
-      - run: pip install -r requirements.txt
-      - name: Seed initial data if needed
-        run: test -f data/concerts.json || python scripts/seed_data.py
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Seed initial data
+        run: |
+          python -u scripts/seed_data.py
+
       - name: Synchronize Cure Concerts Guide
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.skip_cureguide }}
         env:
-          CUREGUIDE_RESPECT_ROBOTS: 'true'
-        run: python -u scripts/sync_cureguide.py
+          CUREGUIDE_RESPECT_ROBOTS: "true"
+        run: |
+          python -u scripts/sync_cureguide.py
+
       - name: Synchronize setlist.fm
         env:
           SETLISTFM_API_KEY: ${{ secrets.SETLISTFM_API_KEY }}
-        run: python scripts/sync_setlistfm.py
+        run: |
+          python -u scripts/sync_setlistfm.py
+
       - name: Run tests
-        run: python -m unittest discover -s tests -v
-      - name: Build site and Excel
-        run: python scripts/build_site.py && python scripts/export_excel.py
+        run: |
+          python -m unittest discover -s tests -v
+
+      - name: Build site
+        run: |
+          python -u scripts/build_site.py
+
+      - name: Export Excel
+        run: |
+          python -u scripts/export_excel.py
+
       - name: Persist updated canonical data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add data/
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(data): daily archive sync [skip ci]"
+
+          if git diff --cached --quiet; then
+            echo "No canonical data changes to commit."
+          else
+            git commit -m "chore: automatic concert database update"
             git push
           fi
-      - uses: actions/upload-pages-artifact@v3
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
+          path: ./dist
+
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
