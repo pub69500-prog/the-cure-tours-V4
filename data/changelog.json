@@ -35948,5 +35948,155 @@
     "new": 29,
     "source": "https://www.setlist.fm/setlist/the-cure/2026/estrella-damm-barcelona-spain-b4ee5fa.html",
     "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:42:58+00:00",
+    "concertId": "cureguide:2026-08-07:vilnius:kaln-parkas",
+    "date": "2026-08-07",
+    "field": "setlist",
+    "old": 0,
+    "new": 26,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/kaln-parkas-vilnius-lithuania-6349122f.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:42:58+00:00",
+    "concertId": "cureguide:2026-07-26:n-mes:ar-nes-de-n-mes",
+    "date": "2026-07-26",
+    "field": "setlist",
+    "old": 31,
+    "new": 30,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/arenes-de-nimes-nimes-france-234d2cc3.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:42:59+00:00",
+    "concertId": "cureguide:2026-07-25:n-mes:ar-nes-de-n-mes",
+    "date": "2026-07-25",
+    "field": "setlist",
+    "old": 31,
+    "new": 30,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/arenes-de-nimes-nimes-france-334c6811.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:42:59+00:00",
+    "concertId": "cureguide:2026-07-24:n-mes:ar-nes-de-n-mes",
+    "date": "2026-07-24",
+    "field": "setlist",
+    "old": 31,
+    "new": 30,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/arenes-de-nimes-nimes-france-234c6813.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:42:59+00:00",
+    "concertId": "cureguide:2026-07-22:nyon:plaine-de-l-asse",
+    "date": "2026-07-22",
+    "field": "setlist",
+    "old": 25,
+    "new": 24,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/grande-scene-nyon-switzerland-1b490188.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:42:59+00:00",
+    "concertId": "cureguide:2026-07-19:bon-ida-cluj-napoca:castelul-b-nffy",
+    "date": "2026-07-19",
+    "field": "setlist",
+    "old": 25,
+    "new": 24,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/castelul-banffy-de-la-bonida-comuna-bonida-romania-73762275.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:00+00:00",
+    "concertId": "cureguide:2026-07-17:plowdiw:grebna-baza",
+    "date": "2026-07-17",
+    "field": "setlist",
+    "old": 27,
+    "new": 26,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/rowing-canal-plovdiv-bulgaria-334ed829.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:01+00:00",
+    "concertId": "cureguide:2026-07-08:tren-n:letisko-tren-n",
+    "date": "2026-07-08",
+    "field": "setlist",
+    "old": 29,
+    "new": 28,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/letisko-trenin-slovakia-3b4e58c0.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:02+00:00",
+    "concertId": "cureguide:2026-06-28:belfast:ormeau-park",
+    "date": "2026-06-28",
+    "field": "setlist",
+    "old": 28,
+    "new": 27,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/ormeau-park-belfast-northern-ireland-13411565.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:03+00:00",
+    "concertId": "cureguide:2026-06-21:newport-isle-of-wight:seaclose-park",
+    "date": "2026-06-21",
+    "field": "setlist",
+    "old": 28,
+    "new": 27,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/main-stage-newport-england-13412165.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:03+00:00",
+    "concertId": "cureguide:2026-06-20:landgraaf:megaland",
+    "date": "2026-06-20",
+    "field": "setlist",
+    "old": 24,
+    "new": 23,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/south-stage-landgraaf-netherlands-634c9a4b.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:03+00:00",
+    "concertId": "cureguide:2026-06-14:firenze:visarno-arena",
+    "date": "2026-06-14",
+    "field": "setlist",
+    "old": 30,
+    "new": 29,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/ippodromo-del-visarno-florence-italy-6b4c2eda.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:03+00:00",
+    "concertId": "cureguide:2026-06-12:nickelsdorf:pannonia-fields-ii",
+    "date": "2026-06-12",
+    "field": "setlist",
+    "old": 22,
+    "new": 21,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/blue-stage-nickelsdorf-austria-5341f309.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:04+00:00",
+    "concertId": "cureguide:2026-06-07:maia-porto:est-dio-municipal-dr-jos-vieira-de-carvalho",
+    "date": "2026-06-07",
+    "field": "setlist",
+    "old": 30,
+    "new": 29,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/cidade-desportiva-da-maia-maia-portugal-734ef6b5.html",
+    "type": "NEW_SETLIST"
+  },
+  {
+    "timestamp": "2026-08-08T11:43:04+00:00",
+    "concertId": "cureguide:2026-06-05:barcelona:parc-del-f-rum",
+    "date": "2026-06-05",
+    "field": "setlist",
+    "old": 30,
+    "new": 29,
+    "source": "https://www.setlist.fm/setlist/the-cure/2026/estrella-damm-barcelona-spain-b4ee5fa.html",
+    "type": "NEW_SETLIST"
   }
 ]
