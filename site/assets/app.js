@@ -3,7 +3,7 @@
    ====================================================================== */
 const CONCERTS = JSON.parse(document.getElementById('data-concerts').textContent);
 
-const STATE = (() => {
+let STATE = (() => {
   try {
     const node = document.getElementById('data-state');
     return node ? JSON.parse(node.textContent) : {};
@@ -12,6 +12,31 @@ const STATE = (() => {
     return {};
   }
 })();
+
+async function loadSynchronizationState(){
+  try {
+    const stateUrl = new URL('../data/state.json', import.meta.url);
+    stateUrl.searchParams.set('_', Date.now().toString());
+
+    const response = await fetch(stateUrl, {
+      cache: 'no-store'
+    });
+
+    if(!response.ok){
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const freshState = await response.json();
+
+    if(freshState && typeof freshState === 'object'){
+      STATE = freshState;
+    }
+  } catch(error) {
+    console.warn('Unable to refresh data/state.json:', error);
+  }
+
+  return STATE;
+}
 
 /*
  * V4.6 — distinguish real Cure-family concerts from guest appearances.
@@ -54,9 +79,15 @@ const GUEST_APPEARANCES = CONCERTS.filter(isGuestAppearance);
    ====================================================================== */
 function formatSyncDate(value){
   if(!value) return 'Information indisponible';
+
   const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return value;
+
+  if(Number.isNaN(date.getTime())){
+    return 'Information indisponible';
+  }
+
   return new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Europe/Paris',
     dateStyle: 'long',
     timeStyle: 'short'
   }).format(date);
@@ -65,15 +96,21 @@ function formatSyncDate(value){
 function getLastSynchronization(){
   const candidates = [
     STATE.setlistFmLastSync,
-    STATE.cureGuideLastSync,
-    STATE.lastSync
+    STATE.cureGuideLastSync
   ]
     .filter(Boolean)
-    .map(value => ({ value, time: new Date(value).getTime() }))
+    .map(value => ({
+      value,
+      time: new Date(value).getTime()
+    }))
     .filter(item => !Number.isNaN(item.time));
 
-  if(!candidates.length) return null;
-  candidates.sort((a,b)=>b.time-a.time);
+  if(!candidates.length){
+    return null;
+  }
+
+  candidates.sort((a,b) => b.time - a.time);
+
   return candidates[0].value;
 }
 
@@ -134,7 +171,13 @@ function fmtDate(d){
   return `${day} ${months[m]} ${y}`;
 }
 
+// Affichage immédiat du prochain concert, puis actualisation de l'horodatage
+// directement depuis data/state.json afin d'éviter toute valeur HTML obsolète.
 renderArchiveStatus();
+loadSynchronizationState().then(() => {
+  renderArchiveStatus();
+});
+
 
 /* ======================================================================
    AGGREGATES (computed once)
