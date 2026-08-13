@@ -14,15 +14,15 @@ from common import load, save, normalize, log_change, now
 
 API = "https://api.setlist.fm/rest/1.0"
 MBID = "69ee3720-a7cb-4402-b48d-a02c366f2bcf"  # The Cure
-UA = "STATICURE/4.9 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
+UA = "STATICURE/4.9.1 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
 
 
 # ================================================================
 # ALIAS DE VILLES
 #
 # Cure Concerts Guide reste la référence.
-# Ces alias servent UNIQUEMENT à reconnaître qu'un nom setlist.fm
-# correspond à la même ville.
+# Ces alias servent UNIQUEMENT au rapprochement avec setlist.fm.
+# Les valeurs enregistrées par Cure Guide ne sont jamais remplacées.
 # ================================================================
 
 CITY_ALIASES = {
@@ -35,24 +35,34 @@ CITY_ALIASES = {
     "plowdiw": "plowdiw",
 
     # Grèce
-    "athens": "athina",
-    "athina": "athina",
+    "athens": "athina athens",
+    "athina": "athina athens",
+    "athina athens": "athina athens",
 
     # Italie
     "florence": "firenze",
     "firenze": "firenze",
 
     # Roumanie
-    "comuna bontida": "bontida",
-    "bontida": "bontida",
+    "comuna bontida": "bontida cluj napoca",
+    "bontida": "bontida cluj napoca",
+    "bontida cluj napoca": "bontida cluj napoca",
+
+    # Royaume-Uni / Isle of Wight
+    "newport": "newport isle of wight",
+    "newport isle of wight": "newport isle of wight",
+
+    # Portugal
+    "maia": "maia porto",
+    "maia porto": "maia porto",
 }
 
 
 # ================================================================
 # ALIAS DE SALLES / SITES
 #
-# Également utilisés uniquement pour la comparaison.
-# Ils n'écrasent JAMAIS les noms Cure Guide.
+# Utilisés uniquement pour la comparaison.
+# Ils n'écrasent jamais les noms provenant de Cure Guide.
 # ================================================================
 
 VENUE_ALIASES = {
@@ -69,7 +79,9 @@ VENUE_ALIASES = {
     "visarno arena": "visarno arena",
 
     # Portugal
-    "cidade desportiva da maia": "estadio municipal dr jose vieira de carvalho",
+    "cidade desportiva da maia":
+        "estadio municipal dr jose vieira de carvalho",
+
     "estadio municipal dr jose vieira de carvalho":
         "estadio municipal dr jose vieira de carvalho",
 
@@ -92,7 +104,7 @@ def log(*args):
 
 def canonical_city(value):
     """
-    Normalise le nom d'une ville pour le matching uniquement.
+    Normalise une ville uniquement pour le matching.
     """
     value = normalize(value)
 
@@ -104,7 +116,7 @@ def canonical_city(value):
 
 def canonical_venue(value):
     """
-    Normalise le nom d'une salle pour le matching uniquement.
+    Normalise une salle uniquement pour le matching.
     """
     value = normalize(value)
 
@@ -117,7 +129,7 @@ def canonical_venue(value):
 def is_cure_concert(concert):
     """
     Empêche une entrée setlist.fm The Cure d'être associée
-    par erreur à une guest appearance.
+    à une apparition chez un autre artiste.
     """
 
     if concert.get("isTheCureConcert") is False:
@@ -139,7 +151,12 @@ def is_cure_concert(concert):
     return artist in CORE_ARTISTS
 
 
+# ================================================================
+# HTTP
+# ================================================================
+
 def get(path, params, key, retries=4):
+
     url = (
         API
         + path
@@ -160,7 +177,9 @@ def get(path, params, key, retries=4):
         1,
         retries + 1,
     ):
+
         try:
+
             with urllib.request.urlopen(
                 req,
                 timeout=30,
@@ -179,8 +198,7 @@ def get(path, params, key, retries=4):
             if exc.code == 404:
 
                 log(
-                    f"[setlist.fm] "
-                    f"no result: {url}"
+                    f"[setlist.fm] no result: {url}"
                 )
 
                 return {
@@ -200,6 +218,7 @@ def get(path, params, key, retries=4):
                 )
 
                 try:
+
                     wait = max(
                         2,
                         int(retry_after),
@@ -209,6 +228,7 @@ def get(path, params, key, retries=4):
                     TypeError,
                     ValueError,
                 ):
+
                     wait = min(
                         60,
                         5 * attempt,
@@ -217,8 +237,7 @@ def get(path, params, key, retries=4):
                 log(
                     "[setlist.fm] HTTP 429 — "
                     f"waiting {wait}s "
-                    f"(attempt "
-                    f"{attempt}/{retries})"
+                    f"(attempt {attempt}/{retries})"
                 )
 
                 time.sleep(wait)
@@ -230,6 +249,7 @@ def get(path, params, key, retries=4):
                 500 <= exc.code <= 599
                 and attempt < retries
             ):
+
                 wait = min(
                     30,
                     3 * attempt,
@@ -248,6 +268,7 @@ def get(path, params, key, retries=4):
             body = ""
 
             try:
+
                 body = (
                     exc.read()
                     .decode(
@@ -301,13 +322,17 @@ def get(path, params, key, retries=4):
     }
 
 
+# ================================================================
+# RÉCUPÉRATION PAR ANNÉE
+# ================================================================
+
 def year_items(year, key):
+
     out = []
     page = 1
 
     log(
-        f"[setlist.fm] "
-        f"scanning year {year}"
+        f"[setlist.fm] scanning year {year}"
     )
 
     while True:
@@ -361,7 +386,12 @@ def year_items(year, key):
     return out
 
 
+# ================================================================
+# SETLIST
+# ================================================================
+
 def songs(item):
+
     out = []
 
     sets = (
@@ -391,7 +421,8 @@ def songs(item):
             or []
         ):
 
-            # Intro/tape non comptée
+            # Les bandes / intros ne sont pas
+            # comptées comme chansons interprétées.
             if song.get("tape"):
                 continue
 
@@ -421,6 +452,10 @@ def songs(item):
     return out
 
 
+# ================================================================
+# MATCHING CURE GUIDE ↔ SETLIST.FM
+# ================================================================
+
 def find_concert(
     concerts,
     date,
@@ -428,27 +463,22 @@ def find_concert(
     venue_name,
 ):
     """
-    V4.9
+    V4.9.1
 
-    Trouve UNIQUEMENT un concert canonique déjà existant.
+    Cure Concerts Guide possède l'événement canonique.
 
-    Cure Concerts Guide reste la source de référence.
+    setlist.fm ne peut enrichir qu'un concert Cure déjà présent.
 
     Ordre de rapprochement :
 
       1. date + ville normalisée + salle normalisée
-      2. date + ville normalisée si résultat unique
+      2. date + ville normalisée, uniquement si unique
 
-    On ne fait PAS de simple date-only si plusieurs événements
-    existent ce jour-là.
+    IMPORTANT :
+    Aucun rapprochement par date seule.
 
-    Les différences telles que :
-
-      Göteborg / Gothenburg
-      Firenze / Florence
-      Plowdiw / Plovdiv
-
-    sont reconnues grâce aux alias.
+    Cela protège les journées comportant plusieurs concerts,
+    plusieurs shows ou plusieurs événements au même endroit.
     """
 
     same_date = [
@@ -461,18 +491,18 @@ def find_concert(
     ]
 
     if not same_date:
-        return None, "no-date"
 
-    city_norm = (
-        canonical_city(
-            city_name
+        return (
+            None,
+            "no-date",
         )
+
+    city_norm = canonical_city(
+        city_name
     )
 
-    venue_norm = (
-        canonical_venue(
-            venue_name
-        )
+    venue_norm = canonical_venue(
+        venue_name
     )
 
     # ============================================================
@@ -527,17 +557,8 @@ def find_concert(
     # ============================================================
     # 2 — DATE + VILLE
     #
-    # Autorisé seulement si UNIQUE.
-    #
-    # Cela permet par exemple :
-    #
-    # Maia :
-    # Cidade Desportiva da Maia
-    # ↔ Estádio Municipal Dr. José Vieira de Carvalho
-    #
-    # Newport :
-    # Main Stage
-    # ↔ Seaclose Park
+    # Autorisé uniquement si un seul concert Cure Guide
+    # correspond à cette ville ce jour-là.
     # ============================================================
 
     city_matches = [
@@ -577,47 +598,18 @@ def find_concert(
         )
 
     # ============================================================
-    # 3 — UNIQUE DATE FALLBACK
-    #
-    # Si Cure Guide ne possède qu'UN SEUL concert The Cure
-    # ce jour-là, nous pouvons raisonnablement associer la
-    # setlist malgré une différence complète de géographie.
-    #
-    # MAIS on log explicitement ce rapprochement.
-    #
-    # Cela reste impossible les jours à plusieurs concerts.
+    # PAS DE DATE-ONLY FALLBACK
     # ============================================================
-
-    if len(same_date) == 1:
-
-        concert = same_date[0]
-
-        log(
-            "[setlist.fm] "
-            "unique-date fallback:",
-            date,
-            "| setlist.fm:",
-            city_name or "?",
-            "/",
-            venue_name or "?",
-            "| Cure Guide:",
-            concert.get("city")
-            or "?",
-            "/",
-            concert.get("venue")
-            or "?",
-        )
-
-        return (
-            concert,
-            "date",
-        )
 
     return (
         None,
         "ambiguous",
     )
 
+
+# ================================================================
+# SYNCHRONISATION
+# ================================================================
 
 def main():
 
@@ -630,8 +622,7 @@ def main():
 
         log(
             "[setlist.fm] "
-            "SETLISTFM_API_KEY "
-            "missing; "
+            "SETLISTFM_API_KEY missing; "
             "synchronization skipped"
         )
 
@@ -639,7 +630,7 @@ def main():
 
     log(
         "[setlist.fm] "
-        "sync V4.9 started"
+        "sync V4.9.1 started"
     )
 
     concerts = load(
@@ -663,15 +654,14 @@ def main():
 
     matched_count = 0
     exact_count = 0
-    alias_or_city_count = 0
-    date_fallback_count = 0
+    canonical_city_count = 0
 
     unmatched_count = 0
     ambiguous_count = 0
     enriched_count = 0
 
     # ============================================================
-    # ANNÉE COURANTE + ANNÉE PRÉCÉDENTE
+    # ANNÉE PRÉCÉDENTE + ANNÉE COURANTE
     # ============================================================
 
     for year in (
@@ -738,7 +728,7 @@ def main():
             # ====================================================
             # AUCUNE CORRESPONDANCE
             #
-            # setlist.fm NE CRÉE JAMAIS un concert canonique.
+            # setlist.fm ne crée jamais de concert canonique.
             # ====================================================
 
             if concert is None:
@@ -747,24 +737,24 @@ def main():
                     match_type
                     == "no-date"
                 ):
+
                     unmatched_count += 1
 
                 else:
+
                     ambiguous_count += 1
 
                 log(
                     "[setlist.fm] "
                     "unmatched — "
-                    "NOT added to "
-                    "canonical archive:",
+                    "NOT added to canonical archive:",
                     event_date,
                     "|",
                     city_name or "?",
                     "|",
                     venue_name or "?",
                     "|",
-                    item.get("url")
-                    or "",
+                    item.get("url") or "",
                 )
 
                 continue
@@ -777,7 +767,7 @@ def main():
 
             elif match_type == "city":
 
-                alias_or_city_count += 1
+                canonical_city_count += 1
 
                 log(
                     "[setlist.fm] "
@@ -793,10 +783,6 @@ def main():
                     concert.get("venue"),
                 )
 
-            elif match_type == "date":
-
-                date_fallback_count += 1
-
             # ====================================================
             # SOURCES
             # ====================================================
@@ -808,10 +794,11 @@ def main():
                 )
             )
 
-            # Cure Guide reste source primaire.
+            # Cure Guide reste la source principale.
             if not sources.get(
                 "primary"
             ):
+
                 sources[
                     "primary"
                 ] = (
@@ -855,8 +842,8 @@ def main():
             # ====================================================
             # DONNÉES HISTORIQUES
             #
-            # setlist.fm remplit seulement les cases vides.
-            # Il n'écrase jamais Cure Guide.
+            # setlist.fm remplit seulement une valeur vide.
+            # Il n'écrase jamais Cure Concerts Guide.
             # ====================================================
 
             for (
@@ -895,6 +882,7 @@ def main():
                     )
                     and value
                 ):
+
                     concert[
                         key_name
                     ] = value
@@ -910,7 +898,10 @@ def main():
             if new_songs:
 
                 # Une fois le concert identifié,
-                # on travaille UNIQUEMENT avec concertId.
+                # seules les lignes portant le même concertId
+                # sont concernées.
+                #
+                # Important pour les doubles shows.
                 existing = [
                     row
                     for row in setlists
@@ -944,7 +935,7 @@ def main():
                     ""
                 ).lower()
 
-                # Cure Guide Confirmed est protégé.
+                # Une setlist Cure Guide confirmée est protégée.
                 replace_allowed = (
                     not existing
                     or
@@ -1022,6 +1013,7 @@ def main():
                     if not concert.get(
                         "setlistConfirmation"
                     ):
+
                         concert[
                             "setlistConfirmation"
                         ] = (
@@ -1031,6 +1023,7 @@ def main():
                     if not concert.get(
                         "setlistStatus"
                     ):
+
                         concert[
                             "setlistStatus"
                         ] = (
@@ -1118,11 +1111,13 @@ def main():
 
     state[
         "setlistFmCanonicalCityMatched"
-    ] = alias_or_city_count
+    ] = canonical_city_count
 
+    # Toujours zéro dans cette version :
+    # le rapprochement date-only est interdit.
     state[
         "setlistFmDateFallbackMatched"
-    ] = date_fallback_count
+    ] = 0
 
     state[
         "setlistFmUnmatched"
@@ -1138,7 +1133,7 @@ def main():
 
     state[
         "setlistFmSyncVersion"
-    ] = "4.9"
+    ] = "4.9.1"
 
     save(
         "state.json",
@@ -1151,7 +1146,7 @@ def main():
 
     log(
         "[setlist.fm] "
-        "sync V4.9 completed"
+        "sync V4.9.1 completed"
     )
 
     log(
@@ -1160,9 +1155,9 @@ def main():
         "matched |",
         exact_count,
         "exact |",
-        alias_or_city_count,
+        canonical_city_count,
         "canonical-city |",
-        date_fallback_count,
+        0,
         "date-fallback |",
         enriched_count,
         "setlists enriched |",
