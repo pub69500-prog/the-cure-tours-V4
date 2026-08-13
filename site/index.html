@@ -20,12 +20,11 @@
 <div class="hero-copy">
 <div class="eyebrow">Archive live · V4.8</div>
 <h1>Archive des concerts</h1>
-<p class="sub">Dates, salles, tournées et setlists de 1976 à 2026.</p>
-
-<div class="hero-status">
-  <span id="last-sync">Dernière synchronisation : —</span>
+<p class="sub">
+  Dates, salles, tournées et setlists de 1976 à 2026.<br>
+  <span id="last-sync">Dernière synchronisation : —</span><br>
   <span id="next-concert">Prochain concert : —</span>
-</div>
+</p>
 </div>
 <div class="kpi-row" id="kpi-row"></div>
 </div>
@@ -302,7 +301,7 @@ try {
   node.type = 'application/json';
   node.textContent = JSON.stringify(concerts);
   document.body.appendChild(node);
-  await import('./assets/app.js');
+  await import('./assets/app.js?v=4.8');
 } catch (error) {
   console.error('STATICURE data loading failed:', error);
   const wrap = document.querySelector('.wrap');
