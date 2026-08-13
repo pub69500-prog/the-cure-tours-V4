@@ -14,15 +14,138 @@ from common import load, save, normalize, log_change, now
 
 API = "https://api.setlist.fm/rest/1.0"
 MBID = "69ee3720-a7cb-4402-b48d-a02c366f2bcf"  # The Cure
-UA = "STATICURE/4.8 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
+UA = "STATICURE/4.9 (+https://github.com/pub69500-prog/the-cure-tours-V4)"
+
+
+# ================================================================
+# ALIAS DE VILLES
+#
+# Cure Concerts Guide reste la référence.
+# Ces alias servent UNIQUEMENT à reconnaître qu'un nom setlist.fm
+# correspond à la même ville.
+# ================================================================
+
+CITY_ALIASES = {
+    # Suède
+    "gothenburg": "goteborg",
+    "goteborg": "goteborg",
+
+    # Bulgarie
+    "plovdiv": "plowdiw",
+    "plowdiw": "plowdiw",
+
+    # Grèce
+    "athens": "athina",
+    "athina": "athina",
+
+    # Italie
+    "florence": "firenze",
+    "firenze": "firenze",
+
+    # Roumanie
+    "comuna bontida": "bontida",
+    "bontida": "bontida",
+}
+
+
+# ================================================================
+# ALIAS DE SALLES / SITES
+#
+# Également utilisés uniquement pour la comparaison.
+# Ils n'écrasent JAMAIS les noms Cure Guide.
+# ================================================================
+
+VENUE_ALIASES = {
+    # Bulgarie
+    "rowing canal": "grebna baza",
+    "grebna baza": "grebna baza",
+
+    # Grèce
+    "olympic complex": "telekom center athens p5",
+    "telekom center athens p5": "telekom center athens p5",
+
+    # Italie
+    "ippodromo del visarno": "visarno arena",
+    "visarno arena": "visarno arena",
+
+    # Portugal
+    "cidade desportiva da maia": "estadio municipal dr jose vieira de carvalho",
+    "estadio municipal dr jose vieira de carvalho":
+        "estadio municipal dr jose vieira de carvalho",
+
+    # Isle of Wight
+    "main stage": "seaclose park",
+    "seaclose park": "seaclose park",
+}
+
+
+CORE_ARTISTS = {
+    "the cure",
+    "easy cure",
+    "malice",
+}
 
 
 def log(*args):
     print(*args, flush=True)
 
 
+def canonical_city(value):
+    """
+    Normalise le nom d'une ville pour le matching uniquement.
+    """
+    value = normalize(value)
+
+    return CITY_ALIASES.get(
+        value,
+        value,
+    )
+
+
+def canonical_venue(value):
+    """
+    Normalise le nom d'une salle pour le matching uniquement.
+    """
+    value = normalize(value)
+
+    return VENUE_ALIASES.get(
+        value,
+        value,
+    )
+
+
+def is_cure_concert(concert):
+    """
+    Empêche une entrée setlist.fm The Cure d'être associée
+    par erreur à une guest appearance.
+    """
+
+    if concert.get("isTheCureConcert") is False:
+        return False
+
+    if (
+        str(
+            concert.get("eventType") or ""
+        ).strip().lower()
+        == "guest appearance"
+    ):
+        return False
+
+    artist = normalize(
+        concert.get("artist")
+        or "The Cure"
+    )
+
+    return artist in CORE_ARTISTS
+
+
 def get(path, params, key, retries=4):
-    url = API + path + "?" + urllib.parse.urlencode(params)
+    url = (
+        API
+        + path
+        + "?"
+        + urllib.parse.urlencode(params)
+    )
 
     req = urllib.request.Request(
         url,
@@ -33,20 +156,33 @@ def get(path, params, key, retries=4):
         },
     )
 
-    for attempt in range(1, retries + 1):
+    for attempt in range(
+        1,
+        retries + 1,
+    ):
         try:
-            with urllib.request.urlopen(req, timeout=30) as response:
+            with urllib.request.urlopen(
+                req,
+                timeout=30,
+            ) as response:
+
                 return json.loads(
-                    response.read().decode("utf-8")
+                    response
+                    .read()
+                    .decode("utf-8")
                 )
 
         except urllib.error.HTTPError as exc:
 
-            # A search without results can legitimately return 404.
+            # Une recherche valide sans résultat peut
+            # retourner 404.
             if exc.code == 404:
+
                 log(
-                    f"[setlist.fm] no result: {url}"
+                    f"[setlist.fm] "
+                    f"no result: {url}"
                 )
+
                 return {
                     "setlist": [],
                     "total": 0,
@@ -54,48 +190,59 @@ def get(path, params, key, retries=4):
                     "itemsPerPage": 20,
                 }
 
-            # Rate limiting.
+            # Rate limit
             if exc.code == 429:
-                retry_after = exc.headers.get(
-                    "Retry-After"
+
+                retry_after = (
+                    exc.headers.get(
+                        "Retry-After"
+                    )
                 )
 
                 try:
                     wait = max(
                         2,
-                        int(retry_after)
+                        int(retry_after),
                     )
-                except (TypeError, ValueError):
+
+                except (
+                    TypeError,
+                    ValueError,
+                ):
                     wait = min(
                         60,
-                        5 * attempt
+                        5 * attempt,
                     )
 
                 log(
                     "[setlist.fm] HTTP 429 — "
                     f"waiting {wait}s "
-                    f"(attempt {attempt}/{retries})"
+                    f"(attempt "
+                    f"{attempt}/{retries})"
                 )
 
                 time.sleep(wait)
+
                 continue
 
-            # Temporary server-side errors.
+            # Erreur serveur temporaire
             if (
                 500 <= exc.code <= 599
                 and attempt < retries
             ):
                 wait = min(
                     30,
-                    3 * attempt
+                    3 * attempt,
                 )
 
                 log(
-                    f"[setlist.fm] HTTP {exc.code} "
-                    f"— retry in {wait}s"
+                    "[setlist.fm] "
+                    f"HTTP {exc.code} — "
+                    f"retry in {wait}s"
                 )
 
                 time.sleep(wait)
+
                 continue
 
             body = ""
@@ -105,15 +252,16 @@ def get(path, params, key, retries=4):
                     exc.read()
                     .decode(
                         "utf-8",
-                        "replace"
+                        "replace",
                     )[:500]
                 )
+
             except Exception:
                 pass
 
             raise RuntimeError(
-                f"setlist.fm HTTP {exc.code} "
-                f"for {url}"
+                f"setlist.fm HTTP "
+                f"{exc.code} for {url}"
                 + (
                     f" — {body}"
                     if body
@@ -124,19 +272,23 @@ def get(path, params, key, retries=4):
         except urllib.error.URLError as exc:
 
             if attempt >= retries:
+
                 raise RuntimeError(
-                    "setlist.fm network error "
-                    f"for {url}: {exc}"
+                    "setlist.fm network "
+                    f"error for {url}: "
+                    f"{exc}"
                 ) from exc
 
             wait = min(
                 30,
-                3 * attempt
+                3 * attempt,
             )
 
             log(
-                "[setlist.fm] network error "
-                f"— retry in {wait}s: {exc}"
+                "[setlist.fm] "
+                "network error — "
+                f"retry in {wait}s: "
+                f"{exc}"
             )
 
             time.sleep(wait)
@@ -154,10 +306,12 @@ def year_items(year, key):
     page = 1
 
     log(
-        f"[setlist.fm] scanning year {year}"
+        f"[setlist.fm] "
+        f"scanning year {year}"
     )
 
     while True:
+
         data = get(
             "/search/setlists",
             {
@@ -168,29 +322,39 @@ def year_items(year, key):
             key,
         )
 
-        items = data.get("setlist") or []
+        items = (
+            data.get("setlist")
+            or []
+        )
 
         out.extend(items)
 
         total = int(
-            data.get("total") or 0
+            data.get("total")
+            or 0
         )
 
         per_page = int(
-            data.get("itemsPerPage") or 20
+            data.get("itemsPerPage")
+            or 20
         )
 
         if not items:
             break
 
-        if page * per_page >= total:
+        if (
+            page * per_page
+            >= total
+        ):
             break
 
         page += 1
+
         time.sleep(0.7)
 
     log(
-        f"[setlist.fm] {year}: "
+        f"[setlist.fm] "
+        f"{year}: "
         f"{len(out)} setlist(s)"
     )
 
@@ -200,12 +364,18 @@ def year_items(year, key):
 def songs(item):
     out = []
 
-    for set_block in (
+    sets = (
         (item.get("sets") or {})
-        .get("set") or []
-    ):
-        encore = set_block.get(
-            "encore"
+        .get("set")
+        or []
+    )
+
+    for set_block in sets:
+
+        encore = (
+            set_block.get(
+                "encore"
+            )
         )
 
         section = (
@@ -217,16 +387,17 @@ def songs(item):
         position = 0
 
         for song in (
-            set_block.get("song") or []
+            set_block.get("song")
+            or []
         ):
 
-            # Tape / intro entries are not
-            # counted as performed songs.
+            # Intro/tape non comptée
             if song.get("tape"):
                 continue
 
             name = (
-                song.get("name") or ""
+                song.get("name")
+                or ""
             ).strip()
 
             if not name:
@@ -236,9 +407,14 @@ def songs(item):
 
             out.append(
                 {
-                    "section": section,
-                    "position": position,
-                    "song": name,
+                    "section":
+                        section,
+
+                    "position":
+                        position,
+
+                    "song":
+                        name,
                 }
             )
 
@@ -252,133 +428,233 @@ def find_concert(
     venue_name,
 ):
     """
-    Match a setlist.fm event against an EXISTING
-    canonical Cure Guide concert.
+    V4.9
 
-    IMPORTANT:
-    setlist.fm never creates a canonical concert.
+    Trouve UNIQUEMENT un concert canonique déjà existant.
 
-    Matching priority:
+    Cure Concerts Guide reste la source de référence.
 
-    1. date + city + venue
-    2. date + city, but ONLY if unique
+    Ordre de rapprochement :
 
-    Date-only matching is deliberately forbidden
-    because The Cure sometimes played multiple
-    concerts on the same date.
+      1. date + ville normalisée + salle normalisée
+      2. date + ville normalisée si résultat unique
+
+    On ne fait PAS de simple date-only si plusieurs événements
+    existent ce jour-là.
+
+    Les différences telles que :
+
+      Göteborg / Gothenburg
+      Firenze / Florence
+      Plowdiw / Plovdiv
+
+    sont reconnues grâce aux alias.
     """
 
     same_date = [
         c
         for c in concerts
-        if c.get("date") == date
+        if (
+            c.get("date") == date
+            and is_cure_concert(c)
+        )
     ]
 
     if not same_date:
-        return None
+        return None, "no-date"
 
-    city_norm = normalize(
-        city_name
+    city_norm = (
+        canonical_city(
+            city_name
+        )
     )
 
-    venue_norm = normalize(
-        venue_name
+    venue_norm = (
+        canonical_venue(
+            venue_name
+        )
     )
 
-    # ----------------------------------------------------------
-    # STRONG MATCH
-    # date + city + venue
-    # ----------------------------------------------------------
+    # ============================================================
+    # 1 — DATE + VILLE + SALLE
+    # ============================================================
 
     exact = [
         c
         for c in same_date
-        if normalize(
-            c.get("city")
-        ) == city_norm
-        and normalize(
-            c.get("venue")
-        ) == venue_norm
+        if (
+            canonical_city(
+                c.get("city")
+            )
+            == city_norm
+
+            and
+
+            canonical_venue(
+                c.get("venue")
+            )
+            == venue_norm
+        )
     ]
 
     if len(exact) == 1:
-        return exact[0]
 
-    # More than one exact result means that Cure Guide
-    # contains multiple shows at the same venue/date.
-    # We must NOT guess which one setlist.fm refers to.
+        return (
+            exact[0],
+            "exact",
+        )
+
     if len(exact) > 1:
+
         log(
-            "[setlist.fm] ambiguous exact match:",
+            "[setlist.fm] "
+            "ambiguous exact match:",
             date,
             "|",
             city_name,
             "|",
             venue_name,
-            f"| {len(exact)} Cure Guide events"
+            "|",
+            len(exact),
+            "Cure Guide events",
         )
 
-        return None
+        return (
+            None,
+            "ambiguous",
+        )
 
-    # ----------------------------------------------------------
-    # SECONDARY MATCH
-    # date + city only, if unique
-    # ----------------------------------------------------------
+    # ============================================================
+    # 2 — DATE + VILLE
+    #
+    # Autorisé seulement si UNIQUE.
+    #
+    # Cela permet par exemple :
+    #
+    # Maia :
+    # Cidade Desportiva da Maia
+    # ↔ Estádio Municipal Dr. José Vieira de Carvalho
+    #
+    # Newport :
+    # Main Stage
+    # ↔ Seaclose Park
+    # ============================================================
 
     city_matches = [
         c
         for c in same_date
-        if normalize(
-            c.get("city")
-        ) == city_norm
+        if (
+            canonical_city(
+                c.get("city")
+            )
+            == city_norm
+        )
     ]
 
     if len(city_matches) == 1:
-        return city_matches[0]
+
+        return (
+            city_matches[0],
+            "city",
+        )
 
     if len(city_matches) > 1:
+
         log(
-            "[setlist.fm] ambiguous city match:",
+            "[setlist.fm] "
+            "ambiguous city match:",
             date,
             "|",
             city_name,
-            f"| {len(city_matches)} Cure Guide events"
+            "|",
+            len(city_matches),
+            "Cure Guide events",
         )
 
-    return None
+        return (
+            None,
+            "ambiguous",
+        )
+
+    # ============================================================
+    # 3 — UNIQUE DATE FALLBACK
+    #
+    # Si Cure Guide ne possède qu'UN SEUL concert The Cure
+    # ce jour-là, nous pouvons raisonnablement associer la
+    # setlist malgré une différence complète de géographie.
+    #
+    # MAIS on log explicitement ce rapprochement.
+    #
+    # Cela reste impossible les jours à plusieurs concerts.
+    # ============================================================
+
+    if len(same_date) == 1:
+
+        concert = same_date[0]
+
+        log(
+            "[setlist.fm] "
+            "unique-date fallback:",
+            date,
+            "| setlist.fm:",
+            city_name or "?",
+            "/",
+            venue_name or "?",
+            "| Cure Guide:",
+            concert.get("city")
+            or "?",
+            "/",
+            concert.get("venue")
+            or "?",
+        )
+
+        return (
+            concert,
+            "date",
+        )
+
+    return (
+        None,
+        "ambiguous",
+    )
 
 
 def main():
+
     key = os.getenv(
         "SETLISTFM_API_KEY",
-        ""
+        "",
     ).strip()
 
     if not key:
+
         log(
             "[setlist.fm] "
-            "SETLISTFM_API_KEY missing; "
+            "SETLISTFM_API_KEY "
+            "missing; "
             "synchronization skipped"
         )
+
         return
 
     log(
-        "[setlist.fm] sync V4.8 started"
+        "[setlist.fm] "
+        "sync V4.9 started"
     )
 
     concerts = load(
         "concerts.json",
-        []
+        [],
     )
 
     setlists = load(
         "setlists.json",
-        []
+        [],
     )
 
     changes = load(
         "changelog.json",
-        []
+        [],
     )
 
     current_year = (
@@ -386,24 +662,33 @@ def main():
     )
 
     matched_count = 0
-    unmatched_count = 0
-    enriched_count = 0
-    ambiguous_count = 0
+    exact_count = 0
+    alias_or_city_count = 0
+    date_fallback_count = 0
 
-    # Current year + previous year.
+    unmatched_count = 0
+    ambiguous_count = 0
+    enriched_count = 0
+
+    # ============================================================
+    # ANNÉE COURANTE + ANNÉE PRÉCÉDENTE
+    # ============================================================
+
     for year in (
         current_year - 1,
         current_year,
     ):
+
         items = year_items(
             year,
-            key
+            key,
         )
 
         for index, item in enumerate(
             items,
-            1
+            1,
         ):
+
             event_date = (
                 dt.datetime.strptime(
                     item["eventDate"],
@@ -414,132 +699,186 @@ def main():
             )
 
             venue = (
-                item.get("venue") or {}
+                item.get("venue")
+                or {}
             )
 
             city = (
-                venue.get("city") or {}
+                venue.get("city")
+                or {}
             )
 
             country = (
-                city.get("country") or {}
+                city.get("country")
+                or {}
             )
 
-            city_name = city.get(
-                "name"
+            city_name = (
+                city.get("name")
             )
 
-            venue_name = venue.get(
-                "name"
+            venue_name = (
+                venue.get("name")
             )
 
-            country_name = country.get(
-                "name"
+            country_name = (
+                country.get("name")
             )
 
-            concert = find_concert(
+            (
+                concert,
+                match_type,
+            ) = find_concert(
                 concerts,
                 event_date,
                 city_name,
                 venue_name,
             )
 
-            # ==================================================
-            # CRITICAL V4.8 RULE
+            # ====================================================
+            # AUCUNE CORRESPONDANCE
             #
-            # Cure Concerts Guide owns the canonical archive.
-            #
-            # A setlist.fm-only event is NOT automatically
-            # inserted into concerts.json.
-            # ==================================================
+            # setlist.fm NE CRÉE JAMAIS un concert canonique.
+            # ====================================================
 
             if concert is None:
 
-                same_date = [
-                    c
-                    for c in concerts
-                    if c.get("date")
-                    == event_date
-                ]
-
-                if same_date:
-                    ambiguous_count += 1
-                else:
+                if (
+                    match_type
+                    == "no-date"
+                ):
                     unmatched_count += 1
 
+                else:
+                    ambiguous_count += 1
+
                 log(
-                    "[setlist.fm] unmatched — "
-                    "NOT added to canonical archive:",
+                    "[setlist.fm] "
+                    "unmatched — "
+                    "NOT added to "
+                    "canonical archive:",
                     event_date,
                     "|",
                     city_name or "?",
                     "|",
                     venue_name or "?",
                     "|",
-                    item.get("url") or "",
+                    item.get("url")
+                    or "",
                 )
 
                 continue
 
             matched_count += 1
 
-            # ==================================================
-            # SOURCE METADATA
-            # ==================================================
+            if match_type == "exact":
 
-            sources = concert.setdefault(
-                "sources",
-                {}
+                exact_count += 1
+
+            elif match_type == "city":
+
+                alias_or_city_count += 1
+
+                log(
+                    "[setlist.fm] "
+                    "matched by canonical city:",
+                    event_date,
+                    "|",
+                    city_name,
+                    "|",
+                    venue_name,
+                    "→",
+                    concert.get("city"),
+                    "|",
+                    concert.get("venue"),
+                )
+
+            elif match_type == "date":
+
+                date_fallback_count += 1
+
+            # ====================================================
+            # SOURCES
+            # ====================================================
+
+            sources = (
+                concert.setdefault(
+                    "sources",
+                    {},
+                )
             )
 
-            # Never replace the primary source.
-            if not sources.get("primary"):
-                sources["primary"] = (
+            # Cure Guide reste source primaire.
+            if not sources.get(
+                "primary"
+            ):
+                sources[
+                    "primary"
+                ] = (
                     "cure-concerts.de"
                 )
 
-            sources["secondary"] = (
+            sources[
+                "secondary"
+            ] = (
                 "setlist.fm"
             )
 
-            concert["setlistFmUrl"] = (
+            concert[
+                "setlistFmUrl"
+            ] = (
                 item.get("url")
             )
 
-            concert["setlistFmId"] = (
+            concert[
+                "setlistFmId"
+            ] = (
                 item.get("id")
             )
 
-            concert["setlistFmVersionId"] = (
-                item.get("versionId")
+            concert[
+                "setlistFmVersionId"
+            ] = (
+                item.get(
+                    "versionId"
+                )
             )
 
-            concert["setlistFmLastUpdated"] = (
-                item.get("lastUpdated")
+            concert[
+                "setlistFmLastUpdated"
+            ] = (
+                item.get(
+                    "lastUpdated"
+                )
             )
 
-            # ==================================================
-            # HISTORICAL DATA
+            # ====================================================
+            # DONNÉES HISTORIQUES
             #
-            # Cure Guide is authoritative.
-            #
-            # setlist.fm may fill a blank but NEVER overwrite
-            # an existing Cure Guide value.
-            # ==================================================
+            # setlist.fm remplit seulement les cases vides.
+            # Il n'écrase jamais Cure Guide.
+            # ====================================================
 
-            for key_name, value in [
+            for (
+                key_name,
+                value,
+            ) in [
+
                 (
                     "city",
                     city_name,
                 ),
+
                 (
                     "venue",
                     venue_name,
                 ),
+
                 (
                     "country",
                     country_name,
                 ),
+
                 (
                     "tour",
                     (
@@ -547,7 +886,9 @@ def main():
                         or {}
                     ).get("name"),
                 ),
+
             ]:
+
                 if (
                     not concert.get(
                         key_name
@@ -558,9 +899,9 @@ def main():
                         key_name
                     ] = value
 
-            # ==================================================
+            # ====================================================
             # SETLIST
-            # ==================================================
+            # ====================================================
 
             new_songs = songs(
                 item
@@ -568,24 +909,22 @@ def main():
 
             if new_songs:
 
-                # IMPORTANT:
-                #
-                # Once a canonical concert has been identified,
-                # setlist rows are linked ONLY by concertId.
-                #
-                # We deliberately do NOT use date + city here,
-                # because double shows can occur at the same
-                # venue/city/date.
+                # Une fois le concert identifié,
+                # on travaille UNIQUEMENT avec concertId.
                 existing = [
                     row
                     for row in setlists
-                    if str(
-                        row.get(
-                            "concertId"
-                        ) or ""
-                    )
-                    == str(
-                        concert["id"]
+                    if (
+                        str(
+                            row.get(
+                                "concertId"
+                            )
+                            or ""
+                        )
+                        ==
+                        str(
+                            concert["id"]
+                        )
                     )
                 ]
 
@@ -593,22 +932,23 @@ def main():
                     concert.get(
                         "setlistConfirmation"
                     )
-                    or concert.get(
+                    or
+                    concert.get(
                         "cureGuideSetlistStatus"
                     )
-                    or concert.get(
+                    or
+                    concert.get(
                         "setlistStatus"
                     )
-                    or ""
+                    or
+                    ""
                 ).lower()
 
-                # setlist.fm may enrich a missing,
-                # unknown or unconfirmed setlist.
-                #
-                # A Cure Guide confirmed setlist is protected.
+                # Cure Guide Confirmed est protégé.
                 replace_allowed = (
                     not existing
-                    or cure_status
+                    or
+                    cure_status
                     in {
                         "",
                         "unknown",
@@ -621,21 +961,28 @@ def main():
 
                     setlists = [
                         row
-                        for row in setlists
-                        if str(
-                            row.get(
-                                "concertId"
-                            ) or ""
-                        )
-                        != str(
-                            concert["id"]
+                        for row
+                        in setlists
+                        if (
+                            str(
+                                row.get(
+                                    "concertId"
+                                )
+                                or ""
+                            )
+                            !=
+                            str(
+                                concert["id"]
+                            )
                         )
                     ]
 
                     setlists += [
                         {
                             "concertId":
-                                concert["id"],
+                                concert[
+                                    "id"
+                                ],
 
                             "date":
                                 event_date,
@@ -653,26 +1000,33 @@ def main():
                                     "url"
                                 ),
                         }
+
                         for entry
                         in new_songs
                     ]
 
                     concert[
                         "songsPlayed"
-                    ] = len(
-                        new_songs
+                    ] = (
+                        len(
+                            new_songs
+                        )
                     )
 
                     concert[
                         "setlistFmStatus"
-                    ] = "Community"
+                    ] = (
+                        "Community"
+                    )
 
                     if not concert.get(
                         "setlistConfirmation"
                     ):
                         concert[
                             "setlistConfirmation"
-                        ] = "Unknown"
+                        ] = (
+                            "Unknown"
+                        )
 
                     if not concert.get(
                         "setlistStatus"
@@ -683,7 +1037,8 @@ def main():
                             concert.get(
                                 "setlistConfirmation"
                             )
-                            or "Unknown"
+                            or
+                            "Unknown"
                         )
 
                     enriched_count += 1
@@ -696,18 +1051,22 @@ def main():
                         len(existing),
                         len(new_songs),
                         item.get("url")
-                        or "setlist.fm",
+                        or
+                        "setlist.fm",
                         "NEW_SETLIST",
                     )
 
             if (
                 index % 10 == 0
-                or index == len(items)
+                or
+                index == len(items)
             ):
+
                 log(
-                    f"[setlist.fm] "
+                    "[setlist.fm] "
                     f"{year}: "
-                    f"{index}/{len(items)} "
+                    f"{index}/"
+                    f"{len(items)} "
                     "processed"
                 )
 
@@ -715,9 +1074,9 @@ def main():
 
         time.sleep(0.7)
 
-    # ==========================================================
-    # SAVE
-    # ==========================================================
+    # ============================================================
+    # SAUVEGARDE
+    # ============================================================
 
     save(
         "concerts.json",
@@ -725,7 +1084,8 @@ def main():
             concerts,
             key=lambda x:
                 x.get("date")
-                or "9999-99-99",
+                or
+                "9999-99-99",
         ),
     )
 
@@ -741,7 +1101,7 @@ def main():
 
     state = load(
         "state.json",
-        {}
+        {},
     )
 
     state[
@@ -751,6 +1111,18 @@ def main():
     state[
         "setlistFmMatched"
     ] = matched_count
+
+    state[
+        "setlistFmExactMatched"
+    ] = exact_count
+
+    state[
+        "setlistFmCanonicalCityMatched"
+    ] = alias_or_city_count
+
+    state[
+        "setlistFmDateFallbackMatched"
+    ] = date_fallback_count
 
     state[
         "setlistFmUnmatched"
@@ -764,19 +1136,34 @@ def main():
         "setlistFmEnriched"
     ] = enriched_count
 
+    state[
+        "setlistFmSyncVersion"
+    ] = "4.9"
+
     save(
         "state.json",
         state,
     )
 
+    # ============================================================
+    # RÉSUMÉ
+    # ============================================================
+
     log(
-        "[setlist.fm] sync completed"
+        "[setlist.fm] "
+        "sync V4.9 completed"
     )
 
     log(
         "[setlist.fm] summary:",
         matched_count,
         "matched |",
+        exact_count,
+        "exact |",
+        alias_or_city_count,
+        "canonical-city |",
+        date_fallback_count,
+        "date-fallback |",
         enriched_count,
         "setlists enriched |",
         unmatched_count,
