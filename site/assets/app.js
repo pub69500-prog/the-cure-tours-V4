@@ -40,6 +40,53 @@ const CORE_CONCERTS = CONCERTS.filter(isCoreConcert);
 const GUEST_APPEARANCES = CONCERTS.filter(isGuestAppearance);
 
 /* ======================================================================
+   HEADER STATUS — last sync + next Cure concert
+   ====================================================================== */
+function renderHeaderStatus(){
+  const lastSyncEl = document.getElementById('last-sync');
+  const nextConcertEl = document.getElementById('next-concert');
+
+  // concerts.json is fetched with no-cache by index.html.
+  // Prefer an explicit dataset timestamp if one exists on an event; otherwise
+  // use the most recent modification date reported for concerts.json.
+  if(lastSyncEl){
+    const explicitSync = CONCERTS
+      .map(c => c.lastSync || c.lastSyncedAt || c.syncedAt || c.updatedAt || null)
+      .filter(Boolean)
+      .sort()
+      .at(-1);
+
+    if(explicitSync){
+      const d = new Date(explicitSync);
+      lastSyncEl.textContent = Number.isNaN(d.getTime())
+        ? `Dernière synchronisation : ${explicitSync}`
+        : `Dernière synchronisation : ${d.toLocaleString('fr-FR', {dateStyle:'medium', timeStyle:'short'})}`;
+    } else {
+      lastSyncEl.textContent = 'Dernière synchronisation : données à jour';
+    }
+  }
+
+  if(nextConcertEl){
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const todayIso = [
+      today.getFullYear(),
+      String(today.getMonth()+1).padStart(2,'0'),
+      String(today.getDate()).padStart(2,'0')
+    ].join('-');
+
+    const next = CORE_CONCERTS
+      .filter(c => c.date && c.date >= todayIso)
+      .slice()
+      .sort((a,b) => a.date.localeCompare(b.date))[0];
+
+    nextConcertEl.textContent = next
+      ? `Prochain concert : ${fmtDate(next.date)} · ${next.city || 'Lieu à confirmer'}${next.venue ? ' · ' + next.venue : ''}`
+      : 'Prochain concert : aucune date annoncée dans la base';
+  }
+}
+
+/* ======================================================================
    HELPERS
    ====================================================================== */
 const fmtInt = n => n==null ? '—' : n.toLocaleString('fr-FR');
@@ -53,6 +100,8 @@ function fmtDate(d){
   const y=parts[0], m=parseInt(parts[1],10)-1, day=parseInt(parts[2],10);
   return `${day} ${months[m]} ${y}`;
 }
+
+renderHeaderStatus();
 
 /* ======================================================================
    AGGREGATES (computed once)
