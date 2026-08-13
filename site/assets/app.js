@@ -3,6 +3,16 @@
    ====================================================================== */
 const CONCERTS = JSON.parse(document.getElementById('data-concerts').textContent);
 
+const STATE = (() => {
+  try {
+    const node = document.getElementById('data-state');
+    return node ? JSON.parse(node.textContent) : {};
+  } catch (error) {
+    console.warn('Unable to read synchronization state:', error);
+    return {};
+  }
+})();
+
 /*
  * V4.6 — distinguish real Cure-family concerts from guest appearances.
  *
@@ -40,50 +50,73 @@ const CORE_CONCERTS = CONCERTS.filter(isCoreConcert);
 const GUEST_APPEARANCES = CONCERTS.filter(isGuestAppearance);
 
 /* ======================================================================
-   HEADER STATUS — last sync + next Cure concert
+   SYNCHRONISATION + PROCHAIN CONCERT
    ====================================================================== */
-function renderHeaderStatus(){
-  const lastSyncEl = document.getElementById('last-sync');
-  const nextConcertEl = document.getElementById('next-concert');
+function formatSyncDate(value){
+  if(!value) return 'Information indisponible';
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'long',
+    timeStyle: 'short'
+  }).format(date);
+}
 
-  // concerts.json is fetched with no-cache by index.html.
-  // Prefer an explicit dataset timestamp if one exists on an event; otherwise
-  // use the most recent modification date reported for concerts.json.
-  if(lastSyncEl){
-    const explicitSync = CONCERTS
-      .map(c => c.lastSync || c.lastSyncedAt || c.syncedAt || c.updatedAt || null)
-      .filter(Boolean)
-      .sort()
-      .at(-1);
+function getLastSynchronization(){
+  const candidates = [
+    STATE.setlistFmLastSync,
+    STATE.cureGuideLastSync,
+    STATE.lastSync
+  ]
+    .filter(Boolean)
+    .map(value => ({ value, time: new Date(value).getTime() }))
+    .filter(item => !Number.isNaN(item.time));
 
-    if(explicitSync){
-      const d = new Date(explicitSync);
-      lastSyncEl.textContent = Number.isNaN(d.getTime())
-        ? `Dernière synchronisation : ${explicitSync}`
-        : `Dernière synchronisation : ${d.toLocaleString('fr-FR', {dateStyle:'medium', timeStyle:'short'})}`;
-    } else {
-      lastSyncEl.textContent = 'Dernière synchronisation : données à jour';
-    }
+  if(!candidates.length) return null;
+  candidates.sort((a,b)=>b.time-a.time);
+  return candidates[0].value;
+}
+
+function localToday(){
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth()+1).padStart(2,'0');
+  const day = String(now.getDate()).padStart(2,'0');
+  return `${year}-${month}-${day}`;
+}
+
+function getNextConcert(){
+  const today = localToday();
+  return CORE_CONCERTS
+    .filter(c => /^\d{4}-\d{2}-\d{2}$/.test(String(c.date || '')))
+    .filter(c => c.date >= today)
+    .sort((a,b)=>a.date.localeCompare(b.date))[0] || null;
+}
+
+function renderArchiveStatus(){
+  const syncElement = document.getElementById('last-sync');
+  if(syncElement){
+    const lastSync = getLastSynchronization();
+    syncElement.textContent = lastSync ? formatSyncDate(lastSync) : 'Information indisponible';
   }
 
-  if(nextConcertEl){
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const todayIso = [
-      today.getFullYear(),
-      String(today.getMonth()+1).padStart(2,'0'),
-      String(today.getDate()).padStart(2,'0')
-    ].join('-');
+  const nextElement = document.getElementById('next-concert');
+  if(!nextElement) return;
 
-    const next = CORE_CONCERTS
-      .filter(c => c.date && c.date >= todayIso)
-      .slice()
-      .sort((a,b) => a.date.localeCompare(b.date))[0];
-
-    nextConcertEl.textContent = next
-      ? `Prochain concert : ${fmtDate(next.date)} · ${next.city || 'Lieu à confirmer'}${next.venue ? ' · ' + next.venue : ''}`
-      : 'Prochain concert : aucune date annoncée dans la base';
+  const next = getNextConcert();
+  if(!next){
+    nextElement.textContent = 'Aucun concert annoncé actuellement';
+    return;
   }
+
+  const parts = [
+    fmtDate(next.date),
+    next.city,
+    next.venue,
+    next.country
+  ].filter(Boolean);
+
+  nextElement.textContent = parts.join(' · ');
 }
 
 /* ======================================================================
@@ -101,7 +134,7 @@ function fmtDate(d){
   return `${day} ${months[m]} ${y}`;
 }
 
-renderHeaderStatus();
+renderArchiveStatus();
 
 /* ======================================================================
    AGGREGATES (computed once)
