@@ -2,7 +2,9 @@ name: Cron test
 
 on:
   schedule:
+    # Test automatique toutes les 5 minutes, heure de Paris
     - cron: "*/5 * * * *"
+      timezone: "Europe/Paris"
 
   workflow_dispatch:
 
@@ -13,5 +15,13 @@ jobs:
     steps:
       - name: Show scheduled run
         run: |
-          echo "Cron test started"
+          echo "======================================"
+          echo "CRON TEST AUTOMATIQUE"
+          echo "======================================"
+          echo "Event: ${{ github.event_name }}"
+          echo "Schedule: ${{ github.event.schedule }}"
+          echo "Date UTC:"
           date -u
+          echo "Date runner:"
+          date
+          echo "======================================"
