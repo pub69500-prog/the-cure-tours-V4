@@ -11,7 +11,7 @@ on:
     # En France métropolitaine :
     # heure d'été  -> 06:17 et 07:17
     # heure d'hiver -> 05:17 et 06:17
-    - cron: "17 4,5 * * *"
+    - cron: "55 4,5 * * *"
 
   workflow_dispatch:
     inputs:
