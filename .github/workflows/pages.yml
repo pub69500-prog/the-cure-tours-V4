@@ -6,12 +6,10 @@ on:
       - main
 
   schedule:
-    # Synchronisation principale quotidienne à 04:17 UTC
-    # Synchronisation de secours quotidienne à 05:17 UTC
-    # En France métropolitaine :
-    # heure d'été  -> 06:17 et 07:17
-    # heure d'hiver -> 05:17 et 06:17
-    - cron: "55 4,5 * * *"
+    # TEST TEMPORAIRE
+    # 06:30 UTC = 08:30 en France (heure d'été)
+    # 07:30 UTC = 09:30 en France (heure d'été)
+    - cron: "30 6,7 * * *"
 
   workflow_dispatch:
     inputs:
@@ -128,8 +126,9 @@ jobs:
       # ============================================================
       # SAUVEGARDE AUTOMATIQUE DES DONNÉES
       #
-      # Seulement pour les exécutions planifiées ou manuelles.
-      # Un simple push ne génère pas un nouveau commit automatique.
+      # Pour les exécutions Scheduled et Run workflow.
+      # Les builds déclenchés par un push ne créent pas
+      # de commit automatique supplémentaire.
       # ============================================================
 
       - name: Persist updated canonical data
