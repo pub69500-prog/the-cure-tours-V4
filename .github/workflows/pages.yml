@@ -6,8 +6,12 @@ on:
       - main
 
   schedule:
-    # Synchronisation quotidienne à 04:17 UTC
-    - cron: "17 4 * * *"
+    # Synchronisation principale quotidienne à 04:17 UTC
+    # Synchronisation de secours quotidienne à 05:17 UTC
+    # En France métropolitaine :
+    # heure d'été  -> 06:17 et 07:17
+    # heure d'hiver -> 05:17 et 06:17
+    - cron: "17 4,5 * * *"
 
   workflow_dispatch:
     inputs:
@@ -41,8 +45,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      # ============================================================
+      # CHECKOUT
+      # ============================================================
+
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # ============================================================
+      # PYTHON
+      # ============================================================
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -55,12 +67,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # ============================================================
+      # DONNÉES INITIALES
+      # ============================================================
+
       - name: Seed initial data
         run: |
           python -u scripts/seed_data.py
 
       # ============================================================
       # CURE CONCERTS GUIDE
+      #
+      # Source canonique des concerts.
       # ============================================================
 
       - name: Synchronize Cure Concerts Guide
@@ -73,6 +91,8 @@ jobs:
 
       # ============================================================
       # SETLIST.FM
+      #
+      # Source secondaire pour l'enrichissement des setlists.
       # ============================================================
 
       - name: Synchronize setlist.fm
@@ -107,6 +127,9 @@ jobs:
 
       # ============================================================
       # SAUVEGARDE AUTOMATIQUE DES DONNÉES
+      #
+      # Seulement pour les exécutions planifiées ou manuelles.
+      # Un simple push ne génère pas un nouveau commit automatique.
       # ============================================================
 
       - name: Persist updated canonical data
