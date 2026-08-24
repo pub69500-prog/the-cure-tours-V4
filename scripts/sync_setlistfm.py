@@ -52,6 +52,10 @@ CITY_ALIASES = {
     "newport": "newport isle of wight",
     "newport isle of wight": "newport isle of wight",
 
+    # Écosse / Edinburgh Summer Sessions
+    "ingliston": "ingliston edinburgh",
+    "ingliston edinburgh": "ingliston edinburgh",
+
     # Portugal
     "maia": "maia porto",
     "maia porto": "maia porto",
@@ -84,6 +88,10 @@ VENUE_ALIASES = {
 
     "estadio municipal dr jose vieira de carvalho":
         "estadio municipal dr jose vieira de carvalho",
+
+    # Écosse / Edinburgh Summer Sessions
+    "royal highland centre showground": "royal highland showgrounds",
+    "royal highland showgrounds": "royal highland showgrounds",
 
     # Isle of Wight
     "main stage": "seaclose park",
