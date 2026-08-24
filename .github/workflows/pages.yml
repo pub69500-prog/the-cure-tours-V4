@@ -112,6 +112,7 @@ jobs:
 
       - name: Synchronize Cure Concerts Guide
         if: ${{ github.event_name != 'workflow_dispatch' || !inputs.skip_cureguide }}
+
         env:
           CUREGUIDE_RESPECT_ROBOTS: "true"
           CUREGUIDE_FULL_SCAN: ${{ inputs.full_cureguide || false }}
@@ -206,11 +207,16 @@ jobs:
       # ============================================================
       # SAUVEGARDE AUTOMATIQUE DES DONNÉES
       #
-      # Exécutée pour :
+      # Exécutée uniquement pour :
       # - schedule
       # - workflow_dispatch
       #
-      # Pas pour un simple push.
+      # Un simple push ne crée pas de nouveau commit automatique.
+      #
+      # IMPORTANT :
+      # Si main a changé pendant le workflow, on ne tente PAS
+      # de rebase automatique sur les JSON générés.
+      # Cela évite les conflits sur concerts.json/state.json/etc.
       # ============================================================
 
       - name: Persist updated canonical data
@@ -220,6 +226,24 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          echo "Checking whether main changed during this workflow..."
+
+          git fetch origin main
+
+          START_SHA="${{ github.sha }}"
+          REMOTE_SHA="$(git rev-parse origin/main)"
+
+          echo "Workflow started from: $START_SHA"
+          echo "Current origin/main:    $REMOTE_SHA"
+
+          if [ "$START_SHA" != "$REMOTE_SHA" ]; then
+            echo ""
+            echo "WARNING: main changed while this workflow was running."
+            echo "Canonical data will NOT be pushed by this run."
+            echo "A later synchronization will start from the newer main branch."
+            exit 0
+          fi
+
           git add data/
 
           if git diff --cached --quiet; then
@@ -227,10 +251,23 @@ jobs:
           else
             git commit -m "chore: automatic concert database update [skip ci]"
 
-            echo "Synchronizing with latest main..."
+            echo ""
+            echo "Final safety check before push..."
 
             git fetch origin main
-            git rebase --autostash origin/main
+
+            REMOTE_SHA_AFTER="$(git rev-parse origin/main)"
+
+            echo "Workflow started from: $START_SHA"
+            echo "Current origin/main:    $REMOTE_SHA_AFTER"
+
+            if [ "$START_SHA" != "$REMOTE_SHA_AFTER" ]; then
+              echo ""
+              echo "WARNING: main changed just before push."
+              echo "Skipping automatic data push to avoid conflicts."
+              exit 0
+            fi
+
             git push origin HEAD:main
           fi
 
