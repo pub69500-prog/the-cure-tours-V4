@@ -99,9 +99,10 @@ jobs:
       # ============================================================
       # CURE CONCERTS GUIDE
       #
-      # Cure Guide reste la source canonique.
+      # Source canonique des concerts.
       #
       # En cas d'échec :
+      #
       # tentative 1 : immédiate
       # tentative 2 : après 30 secondes
       # tentative 3 : après 60 secondes
@@ -165,8 +166,8 @@ jobs:
       # ============================================================
       # SETLIST.FM
       #
-      # Source secondaire.
-      # Cure Guide reste la source canonique.
+      # Source secondaire pour enrichir les setlists.
+      # Cure Guide reste la source canonique des concerts.
       # ============================================================
 
       - name: Synchronize setlist.fm
@@ -207,16 +208,25 @@ jobs:
       # ============================================================
       # SAUVEGARDE AUTOMATIQUE DES DONNÉES
       #
-      # Exécutée uniquement pour :
+      # Uniquement pour :
+      #
       # - schedule
       # - workflow_dispatch
       #
-      # Un simple push ne crée pas de nouveau commit automatique.
+      # Les runs déclenchés par un push ne créent pas
+      # automatiquement un nouveau commit.
       #
       # IMPORTANT :
-      # Si main a changé pendant le workflow, on ne tente PAS
-      # de rebase automatique sur les JSON générés.
-      # Cela évite les conflits sur concerts.json/state.json/etc.
+      #
+      # On ne fait PLUS de :
+      #
+      # git rebase --autostash origin/main
+      #
+      # Si main a changé pendant la synchronisation,
+      # on abandonne simplement le push de ce run.
+      #
+      # Le prochain passage repartira de la nouvelle version
+      # de main et resynchronisera les données.
       # ============================================================
 
       - name: Persist updated canonical data
@@ -226,49 +236,98 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          echo "Checking whether main changed during this workflow..."
+          echo "============================================"
+          echo "Checking repository state before data commit"
+          echo "============================================"
 
           git fetch origin main
 
           START_SHA="${{ github.sha }}"
           REMOTE_SHA="$(git rev-parse origin/main)"
 
-          echo "Workflow started from: $START_SHA"
-          echo "Current origin/main:    $REMOTE_SHA"
+          echo ""
+          echo "Workflow started from:"
+          echo "$START_SHA"
+
+          echo ""
+          echo "Current origin/main:"
+          echo "$REMOTE_SHA"
+
+          echo ""
 
           if [ "$START_SHA" != "$REMOTE_SHA" ]; then
+            echo "WARNING:"
+            echo "main changed while this workflow was running."
             echo ""
-            echo "WARNING: main changed while this workflow was running."
             echo "Canonical data will NOT be pushed by this run."
-            echo "A later synchronization will start from the newer main branch."
+            echo ""
+            echo "This prevents conflicts in:"
+            echo "  data/concerts.json"
+            echo "  data/changelog.json"
+            echo "  data/state.json"
+            echo ""
+            echo "A later synchronization will restart"
+            echo "from the newer main branch."
             exit 0
           fi
+
+          echo "main has not changed."
+          echo "Preparing canonical data..."
 
           git add data/
 
           if git diff --cached --quiet; then
+
+            echo ""
             echo "No canonical data changes to commit."
+
           else
+
+            echo ""
+            echo "Canonical data changed."
+            echo "Creating automatic commit..."
+
             git commit -m "chore: automatic concert database update [skip ci]"
 
             echo ""
-            echo "Final safety check before push..."
+            echo "============================================"
+            echo "Final safety check before push"
+            echo "============================================"
 
             git fetch origin main
 
             REMOTE_SHA_AFTER="$(git rev-parse origin/main)"
 
-            echo "Workflow started from: $START_SHA"
-            echo "Current origin/main:    $REMOTE_SHA_AFTER"
+            echo ""
+            echo "Workflow started from:"
+            echo "$START_SHA"
+
+            echo ""
+            echo "Current origin/main:"
+            echo "$REMOTE_SHA_AFTER"
+
+            echo ""
 
             if [ "$START_SHA" != "$REMOTE_SHA_AFTER" ]; then
+              echo "WARNING:"
+              echo "main changed just before the automatic push."
               echo ""
-              echo "WARNING: main changed just before push."
-              echo "Skipping automatic data push to avoid conflicts."
+              echo "Automatic data push skipped."
+              echo "No rebase will be attempted."
+              echo ""
+              echo "A later synchronization will restart"
+              echo "from the newer main branch."
               exit 0
             fi
 
+            echo "Repository still unchanged."
+            echo "Pushing canonical data..."
+
             git push origin HEAD:main
+
+            echo ""
+            echo "Canonical data successfully pushed."
+
           fi
 
 
