@@ -149,7 +149,7 @@ def allowed(url):
     return rp.can_fetch(UA, url)
 
 
-def fetch(url):
+def fetch(url, retries=4):
     if not allowed(url):
         raise RuntimeError(f"robots.txt interdit {url}")
 
@@ -162,9 +162,33 @@ def fetch(url):
         },
     )
 
-    with urllib.request.urlopen(req, timeout=20) as response:
-        return response.read().decode("utf-8", "replace")
+    last_error = None
 
+    for attempt in range(1, retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as response:
+                return response.read().decode("utf-8", "replace")
+
+        except Exception as exc:
+            last_error = exc
+
+            if attempt >= retries:
+                break
+
+            wait_time = 5 * attempt
+
+            _log(
+                "[cureguide] fetch failed "
+                f"({attempt}/{retries}) "
+                f"{url}: {exc} — "
+                f"retry in {wait_time}s"
+            )
+
+            time.sleep(wait_time)
+
+    raise RuntimeError(
+        f"failed to fetch {url} after {retries} attempts: {last_error}"
+    )
 
 def _inline_confirmation_hint(anchor):
     bits = []
