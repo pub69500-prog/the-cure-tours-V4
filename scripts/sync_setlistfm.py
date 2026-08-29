@@ -59,6 +59,10 @@ CITY_ALIASES = {
     # Portugal
     "maia": "maia porto",
     "maia porto": "maia porto",
+
+    # France / Rock en Seine
+    "saint cloud": "saint cloud paris",
+    "saint cloud paris": "saint cloud paris",
 }
 
 
@@ -96,6 +100,10 @@ VENUE_ALIASES = {
     # Isle of Wight
     "main stage": "seaclose park",
     "seaclose park": "seaclose park",
+
+    # France / Rock en Seine
+    "grande scene": "domaine national de saint cloud",
+    "domaine national de saint cloud": "domaine national de saint cloud",
 }
 
 
