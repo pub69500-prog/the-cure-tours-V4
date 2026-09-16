@@ -2,9 +2,9 @@
   "lastSync": "2026-08-08T02:00:00+00:00",
   "version": "4.0.0",
   "note": "Seed V3 + Vilnius 2026-08-07 verified from Cure Concerts Guide",
-  "setlistFmLastSync": "2026-09-16T07:55:53+00:00",
-  "cureGuideLastSync": "2026-09-16T07:55:42+00:00",
-  "cureGuideCandidates": 39,
+  "setlistFmLastSync": "2026-09-16T10:19:27+00:00",
+  "cureGuideLastSync": "2026-09-16T10:19:16+00:00",
+  "cureGuideCandidates": 38,
   "cureGuideVersion": "4.8",
   "cureGuideMode": "INCREMENTAL",
   "cureGuideSeenUpdateEntries": [
@@ -690,12 +690,12 @@
     "2026-01-02|https://www.cure-concerts.de/concerts/1985-09-16.php",
     "2026-01-02|https://www.cure-concerts.de/concerts/1989-09-16.php",
     "2026-01-02|https://www.cure-concerts.de/concerts/1996-09-16.php",
-    "2026-01-02|https://www.cure-concerts.de/concerts/2004-08-31.php"
+    "2026-01-02|https://www.cure-concerts.de/concerts/1981-07-05.php"
   ],
   "cureGuideLatestUpdateDate": "2026-08-30",
   "cureGuideIncrementalVersion": "4.8",
   "cureGuideUpdatesListed": 683,
-  "cureGuideNewUpdateEntries": 4,
+  "cureGuideNewUpdateEntries": 1,
   "setlistFmMatched": 31,
   "setlistFmExactMatched": 21,
   "setlistFmCanonicalCityMatched": 10,
