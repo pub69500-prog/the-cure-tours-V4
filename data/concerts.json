@@ -5258,29 +5258,24 @@
     "venue": "London School of Economics",
     "country": "England",
     "event": null,
-    "songsPlayed": 7,
+    "songsPlayed": "7",
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
     "curfew": null,
     "dayOfWeek": "Saturday",
     "tour": "'Future Pastimes'",
-    "attendance": 800,
-    "concertCapacity": 800,
+    "attendance": "800",
+    "concertCapacity": "800",
     "soldOut": "False",
     "venueAddress": "[no address yet]",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/1979-11-17.php",
-    "pageTitle": "The Cure live concert: 1979-11-17 London - London School of Economics (England)",
-    "scrapedAt": "2026-11-17T17:52:38+00:00",
+    "pageTitle": "1979-11-17 London - London School of Economics (England)",
+    "scrapedAt": "46237.52576388889",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:1979-11-20:preston:polytechnic-union-main-hall",
@@ -9816,7 +9811,7 @@
     "venue": "Dominion Theatre",
     "country": "England",
     "event": null,
-    "songsPlayed": 22,
+    "songsPlayed": "22",
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -9829,16 +9824,11 @@
     "venueAddress": "Tottenham Court Road | London, W1",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/1980-11-17.php",
-    "pageTitle": "The Cure live concert: 1980-11-17 London - Dominion Theatre (England)",
-    "scrapedAt": "2026-11-17T17:52:40+00:00",
+    "pageTitle": "1980-11-17 London - Dominion Theatre (England)",
+    "scrapedAt": "46237.528715277775",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:1980-11-18:cardiff:cardiff-university-the-great-hall",
@@ -9850,7 +9840,7 @@
     "venue": "Cardiff University, The Great Hall",
     "country": "Wales",
     "event": null,
-    "songsPlayed": "21",
+    "songsPlayed": 21,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -9863,11 +9853,16 @@
     "venueAddress": "The Great Hall, Cardiff Uni Students Union | Senghennydd Road | Union building | Cardiff CF10",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/1980-11-18.php",
-    "pageTitle": "1980-11-18 Cardiff - Cardiff University, The Great Hall (Wales)",
-    "scrapedAt": "46237.52873842593",
+    "pageTitle": "The Cure live concert: 1980-11-18 Cardiff - Cardiff University, The Great Hall (Wales)",
+    "scrapedAt": "2026-11-18T12:14:54+00:00",
     "sources": {
       "primary": "cure-concerts.de"
-    }
+    },
+    "confirmationSource": "cure-concerts.de",
+    "isTheCureConcert": true,
+    "guestAppearance": false,
+    "concertConfirmation": "Unknown",
+    "setlistConfirmation": "Unconfirmed"
   },
   {
     "id": "cureguide:1980-12-18:london:notre-dame-hall",
@@ -17129,7 +17124,7 @@
     "venue": "Beacon Theatre",
     "country": "USA/NY",
     "event": null,
-    "songsPlayed": 23,
+    "songsPlayed": "23",
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -17142,16 +17137,11 @@
     "venueAddress": "2124 Broadway | New York, NY 10023",
     "generalVenueCapacity": "2829",
     "sourceUrl": "https://www.cure-concerts.de/concerts/1984-11-17.php",
-    "pageTitle": "The Cure live concert: 1984-11-17 New York City - Beacon Theatre (USA/NY)",
-    "scrapedAt": "2026-11-17T17:52:41+00:00",
+    "pageTitle": "1984-11-17 New York City - Beacon Theatre (USA/NY)",
+    "scrapedAt": "46237.533483796295",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:1985-06-20:barcelona:studio-54",
@@ -21513,7 +21503,7 @@
     "venue": "Palacio de los Deportes",
     "country": "Spain",
     "event": null,
-    "songsPlayed": "25",
+    "songsPlayed": 25,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -21526,11 +21516,16 @@
     "venueAddress": "Palacio de los Deportes (en catalán, Palau dels Esports) | Carrer Joaquim Blume, S/N | Barcelona",
     "generalVenueCapacity": "8000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/1987-11-18.php",
-    "pageTitle": "1987-11-18 Barcelona - Palacio de los Deportes (Spain)",
-    "scrapedAt": "46237.536307870374",
+    "pageTitle": "The Cure live concert: 1987-11-18 Barcelona - Palacio de los Deportes (Spain)",
+    "scrapedAt": "2026-11-18T12:14:56+00:00",
     "sources": {
       "primary": "cure-concerts.de"
-    }
+    },
+    "confirmationSource": "cure-concerts.de",
+    "isTheCureConcert": true,
+    "guestAppearance": false,
+    "concertConfirmation": "Unknown",
+    "setlistConfirmation": "Unconfirmed"
   },
   {
     "id": "cureguide:1987-11-19:madrid:palacio-de-los-deportes",
@@ -27719,7 +27714,7 @@
     "venue": "NEC Arena",
     "country": "England",
     "event": null,
-    "songsPlayed": "25",
+    "songsPlayed": 25,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -27732,11 +27727,16 @@
     "venueAddress": "Perimeter Rd | Birmingham B40 1NT | England",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/1992-11-18.php",
-    "pageTitle": "1992-11-18 Birmingham - NEC Arena (England)",
-    "scrapedAt": "46237.54033564815",
+    "pageTitle": "The Cure live concert: 1992-11-18 Birmingham - NEC Arena (England)",
+    "scrapedAt": "2026-11-18T12:14:58+00:00",
     "sources": {
       "primary": "cure-concerts.de"
-    }
+    },
+    "confirmationSource": "cure-concerts.de",
+    "isTheCureConcert": true,
+    "guestAppearance": false,
+    "concertConfirmation": "Unknown",
+    "setlistConfirmation": "Unconfirmed"
   },
   {
     "id": "cureguide:1992-11-19:birmingham:nec-arena",
@@ -31170,7 +31170,7 @@
     "venue": "Sportovni Hala",
     "country": "Czech Republic",
     "event": null,
-    "songsPlayed": 28,
+    "songsPlayed": "28",
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -31183,16 +31183,11 @@
     "venueAddress": "Za elektrárnou 419/1 | 170 00 Praha-Bubenec",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/1996-11-17.php",
-    "pageTitle": "The Cure live concert: 1996-11-17 Praha - Sportovni Hala (Czech Republic)",
-    "scrapedAt": "2026-11-17T17:52:43+00:00",
+    "pageTitle": "1996-11-17 Praha - Sportovni Hala (Czech Republic)",
+    "scrapedAt": "46237.542592592596",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:1996-11-19:stuttgart:hanns-martin-schleyer-halle",
@@ -31691,13 +31686,13 @@
     "id": "cureguide:1997-01-09:new-york-city:madison-square-garden",
     "date": "1997-01-09",
     "year": 1997,
-    "artist": "David Bowie live concert",
+    "artist": "David Bowie",
     "eventType": "Guest appearance",
     "city": "New York City",
     "venue": "Madison Square Garden",
     "country": "USA/NY",
     "event": "David Bowie 50th birthday concert",
-    "songsPlayed": 25,
+    "songsPlayed": "25",
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -31710,16 +31705,11 @@
     "venueAddress": "Four Pennsylvania Plaza | (7th Ave. between W. 31st St. and W. 33rd St.) | New York, NY 10001",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/1997-01-09.php",
-    "pageTitle": "David Bowie live concert: 1997-01-09 New York City - Madison Square Garden (USA/NY) - 'David Bowie 50th birthday concert'",
-    "scrapedAt": "2026-11-17T17:52:44+00:00",
+    "pageTitle": "David Bowie 1997-01-09 New York City - Madison Square Garden (USA/NY) \"David Bowie 50th birthday concert\"",
+    "scrapedAt": "46237.54292824074",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": false,
-    "guestAppearance": true,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:1997-06-13:mountain-view-san-francisco-san-jose:shoreline-amphitheatre",
@@ -36516,29 +36506,24 @@
     "venue": "Everett Events Center",
     "country": "USA/WA",
     "event": null,
-    "songsPlayed": 29,
+    "songsPlayed": "29",
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
     "curfew": null,
     "dayOfWeek": "Tuesday",
     "tour": "-",
-    "attendance": 5382,
-    "concertCapacity": 7560,
+    "attendance": "5382",
+    "concertCapacity": "7560",
     "soldOut": "False",
     "venueAddress": "2000 Hewitt Avenue | Everett, WA 98201",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2004-08-31.php",
-    "pageTitle": "The Cure live concert: 2004-08-31 Everett / Seattle - Everett Events Center (USA/WA)",
-    "scrapedAt": "2026-11-17T17:52:46+00:00",
+    "pageTitle": "2004-08-31 Everett - Everett Events Center (USA/WA)",
+    "scrapedAt": "46237.54608796296",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:2004-09-02:monterrey:arena-monterrey",
@@ -36782,7 +36767,7 @@
     "venue": "Colosseo",
     "country": "Italy",
     "event": "MTV Live in Rome",
-    "songsPlayed": "9",
+    "songsPlayed": 9,
     "setlistStatus": "Unconfirmed",
     "setLengthMin": null,
     "setTime": null,
@@ -36795,11 +36780,16 @@
     "venueAddress": "Colosseo - via san Gregorio",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2004-11-18.php",
-    "pageTitle": "2004-11-18 Roma - Colosseo (Italy) \"MTV Live in Rome\"",
-    "scrapedAt": "46237.54625",
+    "pageTitle": "The Cure live concert: 2004-11-18 Roma - Colosseo (Italy) - 'MTV Live in Rome'",
+    "scrapedAt": "2026-11-18T12:15:00+00:00",
     "sources": {
       "primary": "cure-concerts.de"
-    }
+    },
+    "confirmationSource": "cure-concerts.de",
+    "isTheCureConcert": true,
+    "guestAppearance": false,
+    "concertConfirmation": "Unknown",
+    "setlistConfirmation": "Unconfirmed"
   },
   {
     "id": "cureguide:2004-11-19:lyon:halle-tony-garnier",
@@ -43510,9 +43500,9 @@
     "venue": "Halle Tony Garnier",
     "country": "France",
     "event": null,
-    "songsPlayed": 30,
+    "songsPlayed": "30",
     "setlistStatus": "Unconfirmed",
-    "setLengthMin": 150,
+    "setLengthMin": "150",
     "setTime": null,
     "curfew": null,
     "dayOfWeek": "Thursday",
@@ -43523,16 +43513,11 @@
     "venueAddress": "20 pl. Antonin Perrin | 69007 Lyon",
     "generalVenueCapacity": "17000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2016-11-17.php",
-    "pageTitle": "The Cure live concert: 2016-11-17 Lyon - Halle Tony Garnier (France)",
-    "scrapedAt": "2026-11-17T17:52:47+00:00",
+    "pageTitle": "2016-11-17 Lyon - Halle Tony Garnier (France)",
+    "scrapedAt": "46237.55063657407",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:2016-11-18:p-rols-montpellier:park-suites-arena",
@@ -43544,9 +43529,9 @@
     "venue": "Park&Suites Arena",
     "country": "France",
     "event": null,
-    "songsPlayed": "29",
+    "songsPlayed": 29,
     "setlistStatus": "Unconfirmed",
-    "setLengthMin": "149",
+    "setLengthMin": 149,
     "setTime": null,
     "curfew": null,
     "dayOfWeek": "Friday",
@@ -43557,11 +43542,16 @@
     "venueAddress": "Park&Suites Arena | Route de la Foire | 34470 Perols",
     "generalVenueCapacity": "14800",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2016-11-18.php",
-    "pageTitle": "2016-11-18 Pérols - Park&Suites Arena (France)",
-    "scrapedAt": "46237.55065972222",
+    "pageTitle": "The Cure live concert: 2016-11-18 Pérols / Montpellier - Park&Suites Arena (France)",
+    "scrapedAt": "2026-11-18T12:15:01+00:00",
     "sources": {
       "primary": "cure-concerts.de"
-    }
+    },
+    "confirmationSource": "cure-concerts.de",
+    "isTheCureConcert": true,
+    "guestAppearance": false,
+    "concertConfirmation": "Unknown",
+    "setlistConfirmation": "Unconfirmed"
   },
   {
     "id": "cureguide:2016-11-20:madrid:barclaycard-center",
@@ -45893,9 +45883,9 @@
     "venue": "Festhalle",
     "country": "Germany",
     "event": null,
-    "songsPlayed": 28,
+    "songsPlayed": "28",
     "setlistStatus": "Unconfirmed",
-    "setLengthMin": 157,
+    "setLengthMin": "157",
     "setTime": "20:45 - 23:22",
     "curfew": null,
     "dayOfWeek": "Thursday",
@@ -45906,16 +45896,11 @@
     "venueAddress": "Festhalle Frankfurt | Ludwig-Erhard-Anlage | 60327 Frankfurt am Main",
     "generalVenueCapacity": "13500",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2022-11-17.php",
-    "pageTitle": "The Cure live concert: 2022-11-17 Frankfurt - Festhalle (Germany)",
-    "scrapedAt": "2026-11-17T17:52:49+00:00",
+    "pageTitle": "2022-11-17 Frankfurt - Festhalle (Germany)",
+    "scrapedAt": "46237.552199074074",
     "sources": {
       "primary": "cure-concerts.de"
-    },
-    "confirmationSource": "cure-concerts.de",
-    "isTheCureConcert": true,
-    "guestAppearance": false,
-    "concertConfirmation": "Unknown",
-    "setlistConfirmation": "Unconfirmed"
+    }
   },
   {
     "id": "cureguide:2022-11-18:eckbolsheim-strasbourg:z-nith-de-strasbourg",
@@ -45927,9 +45912,9 @@
     "venue": "Zénith de Strasbourg",
     "country": "France",
     "event": null,
-    "songsPlayed": "28",
+    "songsPlayed": 28,
     "setlistStatus": "Unconfirmed",
-    "setLengthMin": "162",
+    "setLengthMin": 162,
     "setTime": "21:12 - 23:54",
     "curfew": null,
     "dayOfWeek": "Friday",
@@ -45940,11 +45925,16 @@
     "venueAddress": "1 allée du Zénith | 67201 Eckbolsheim",
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2022-11-18.php",
-    "pageTitle": "2022-11-18 Eckbolsheim - Zénith de Strasbourg (France)",
-    "scrapedAt": "46237.55222222222",
+    "pageTitle": "The Cure live concert: 2022-11-18 Eckbolsheim / Strasbourg - Zénith de Strasbourg (France)",
+    "scrapedAt": "2026-11-18T12:15:04+00:00",
     "sources": {
       "primary": "cure-concerts.de"
-    }
+    },
+    "confirmationSource": "cure-concerts.de",
+    "isTheCureConcert": true,
+    "guestAppearance": false,
+    "concertConfirmation": "Unknown",
+    "setlistConfirmation": "Unconfirmed"
   },
   {
     "id": "cureguide:2022-11-19:basel:st-jakobshalle",
@@ -47768,7 +47758,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2025-06-29.php",
     "pageTitle": "Olivia Rodrigo live concert: 2025-06-29 Pilton - Worthy Farm (England) - 'Glastonbury Festival'",
-    "scrapedAt": "2026-11-17T17:52:50+00:00",
+    "scrapedAt": "2026-11-18T12:15:05+00:00",
     "sources": {
       "primary": "cure-concerts.de"
     },
@@ -47802,7 +47792,7 @@
     "generalVenueCapacity": "75000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-05.php",
     "pageTitle": "The Cure live concert: 2026-06-05 Barcelona - Parc del Fòrum (Spain) - 'Primavera Sound'",
-    "scrapedAt": "2026-11-17T17:52:51+00:00",
+    "scrapedAt": "2026-11-18T12:15:07+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -47842,7 +47832,7 @@
     "generalVenueCapacity": "75000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-06.php",
     "pageTitle": "Olivia Rodrigo live concert: 2026-06-06 Barcelona - Parc del Fòrum (Spain) - 'Primavera Sound'",
-    "scrapedAt": "2026-11-17T17:52:53+00:00",
+    "scrapedAt": "2026-11-18T12:15:09+00:00",
     "sources": {
       "primary": "cure-concerts.de"
     },
@@ -47876,7 +47866,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-07.php",
     "pageTitle": "The Cure live concert: 2026-06-07 Maia / Porto - Estádio Municipal Dr. José Vieira de Carvalho (Portugal) - 'North Festival'",
-    "scrapedAt": "2026-11-17T17:52:54+00:00",
+    "scrapedAt": "2026-11-18T12:15:11+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -47916,7 +47906,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-12.php",
     "pageTitle": "The Cure live concert: 2026-06-12 Nickelsdorf - Pannonia Fields II (Austria) - 'Nova Rock'",
-    "scrapedAt": "2026-11-17T17:52:56+00:00",
+    "scrapedAt": "2026-11-18T12:15:13+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -47956,7 +47946,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-14.php",
     "pageTitle": "The Cure live concert: 2026-06-14 Firenze - Visarno Arena (Italy) - 'Firenze Rocks'",
-    "scrapedAt": "2026-11-17T17:52:57+00:00",
+    "scrapedAt": "2026-11-18T12:15:14+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -47996,7 +47986,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-20.php",
     "pageTitle": "The Cure live concert: 2026-06-20 Landgraaf - Megaland (Netherlands) - 'Pinkpop'",
-    "scrapedAt": "2026-11-17T17:52:59+00:00",
+    "scrapedAt": "2026-11-18T12:15:16+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48036,7 +48026,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-21.php",
     "pageTitle": "The Cure live concert: 2026-06-21 Newport / Isle of Wight - Seaclose Park (England) - 'Isle of Wight Festival'",
-    "scrapedAt": "2026-11-17T17:53:00+00:00",
+    "scrapedAt": "2026-11-18T12:15:18+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48076,7 +48066,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-24.php",
     "pageTitle": "The Cure live concert: 2026-06-24 Cardiff - Blackweir Fields (Wales) - 'Blackweir'",
-    "scrapedAt": "2026-11-17T17:53:02+00:00",
+    "scrapedAt": "2026-11-18T12:15:20+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48116,7 +48106,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-26.php",
     "pageTitle": "The Cure live concert: 2026-06-26 Dublin - Marlay Park (Ireland)",
-    "scrapedAt": "2026-11-17T17:53:03+00:00",
+    "scrapedAt": "2026-11-18T12:15:22+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48156,7 +48146,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-06-28.php",
     "pageTitle": "The Cure live concert: 2026-06-28 Belfast - Ormeau Park (Northern Ireland) - 'Belsonic'",
-    "scrapedAt": "2026-11-17T17:53:05+00:00",
+    "scrapedAt": "2026-11-18T12:15:23+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48196,7 +48186,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-01.php",
     "pageTitle": "The Cure live concert: 2026-07-01 Roskilde - Festivalpladsen (Denmark) - 'Roskilde Festival'",
-    "scrapedAt": "2026-11-17T17:53:06+00:00",
+    "scrapedAt": "2026-11-18T12:15:25+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48236,7 +48226,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-03.php",
     "pageTitle": "The Cure live concert: 2026-07-03 Gdynia - Port Lotniczy Gdynia-Kosakowo (Poland) - 'Open'er Festival'",
-    "scrapedAt": "2026-11-17T17:53:08+00:00",
+    "scrapedAt": "2026-11-18T12:15:27+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48276,7 +48266,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-05.php",
     "pageTitle": "The Cure live concert: 2026-07-05 Werchter - Festival Park Werchter (Belgium) - 'Rock Werchter'",
-    "scrapedAt": "2026-11-17T17:53:09+00:00",
+    "scrapedAt": "2026-11-18T12:15:29+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48316,7 +48306,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-08.php",
     "pageTitle": "The Cure live concert: 2026-07-08 Trenčín - Letisko Trenčín (Slovakia) - 'Pohoda Festival'",
-    "scrapedAt": "2026-11-17T17:53:11+00:00",
+    "scrapedAt": "2026-11-18T12:15:31+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48356,7 +48346,7 @@
     "generalVenueCapacity": "17000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-10.php",
     "pageTitle": "The Cure live concert: 2026-07-10 Berlin - Parkbühne Wuhlheide (Germany)",
-    "scrapedAt": "2026-11-17T17:53:12+00:00",
+    "scrapedAt": "2026-11-18T12:15:32+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48396,7 +48386,7 @@
     "generalVenueCapacity": "17000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-11.php",
     "pageTitle": "The Cure live concert: 2026-07-11 Berlin - Parkbühne Wuhlheide (Germany)",
-    "scrapedAt": "2026-11-17T17:53:14+00:00",
+    "scrapedAt": "2026-11-18T12:15:34+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48436,7 +48426,7 @@
     "generalVenueCapacity": "17000",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-12.php",
     "pageTitle": "The Cure live concert: 2026-07-12 Berlin - Parkbühne Wuhlheide (Germany)",
-    "scrapedAt": "2026-11-17T17:53:15+00:00",
+    "scrapedAt": "2026-11-18T12:15:36+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48476,7 +48466,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-15.php",
     "pageTitle": "The Cure live concert: 2026-07-15 Athína / Athens - Telekom Center Athens / P5 (Greece) - 'Ejekt Festival'",
-    "scrapedAt": "2026-11-17T17:53:17+00:00",
+    "scrapedAt": "2026-11-18T12:15:38+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48516,7 +48506,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-17.php",
     "pageTitle": "The Cure live concert: 2026-07-17 Plowdiw - Grebna Baza (Bulgaria) - 'PhillGood Festival'",
-    "scrapedAt": "2026-11-17T17:53:18+00:00",
+    "scrapedAt": "2026-11-18T12:15:40+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48556,7 +48546,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-19.php",
     "pageTitle": "The Cure live concert: 2026-07-19 Bonțida / Cluj-Napoca - Castelul Bánffy (Romania) - 'Electric Castle'",
-    "scrapedAt": "2026-11-17T17:53:20+00:00",
+    "scrapedAt": "2026-11-18T12:15:41+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48596,7 +48586,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-22.php",
     "pageTitle": "The Cure live concert: 2026-07-22 Nyon - Plaine de l'Asse (Switzerland) - 'Paleo Festival'",
-    "scrapedAt": "2026-11-17T17:53:21+00:00",
+    "scrapedAt": "2026-11-18T12:15:43+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48636,7 +48626,7 @@
     "generalVenueCapacity": "13800",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-24.php",
     "pageTitle": "The Cure live concert: 2026-07-24 Nîmes - Arènes de Nîmes (France) - 'Festival de Nîmes'",
-    "scrapedAt": "2026-11-17T17:53:23+00:00",
+    "scrapedAt": "2026-11-18T12:15:45+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48676,7 +48666,7 @@
     "generalVenueCapacity": "13800",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-25.php",
     "pageTitle": "The Cure live concert: 2026-07-25 Nîmes - Arènes de Nîmes (France) - 'Festival de Nîmes'",
-    "scrapedAt": "2026-11-17T17:53:24+00:00",
+    "scrapedAt": "2026-11-18T12:15:47+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48716,7 +48706,7 @@
     "generalVenueCapacity": "13800",
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-07-26.php",
     "pageTitle": "The Cure live concert: 2026-07-26 Nîmes - Arènes de Nîmes (France) - 'Festival de Nîmes'",
-    "scrapedAt": "2026-11-17T17:53:26+00:00",
+    "scrapedAt": "2026-11-18T12:15:48+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48756,7 +48746,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-07.php",
     "pageTitle": "The Cure live concert: 2026-08-07 Vilnius - Kalnų Parkas (Lithuania) - 'Sounds Good Vilnius'",
-    "scrapedAt": "2026-11-17T17:53:27+00:00",
+    "scrapedAt": "2026-11-18T12:15:50+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48796,7 +48786,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-09.php",
     "pageTitle": "The Cure live concert: 2026-08-09 Tallinn - Unibet Arena Kvartal (Estonia)",
-    "scrapedAt": "2026-11-17T17:53:29+00:00",
+    "scrapedAt": "2026-11-18T12:15:52+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48836,7 +48826,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-12.php",
     "pageTitle": "The Cure live concert: 2026-08-12 Oslo - Tøyenparken (Norway) - 'Øyafestivalen'",
-    "scrapedAt": "2026-11-17T17:53:30+00:00",
+    "scrapedAt": "2026-11-18T12:15:54+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48876,7 +48866,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-14.php",
     "pageTitle": "The Cure live concert: 2026-08-14 Göteborg - Slottsskogen (Sweden) - 'Way Out West'",
-    "scrapedAt": "2026-11-17T17:53:32+00:00",
+    "scrapedAt": "2026-11-18T12:15:56+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48916,7 +48906,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-21.php",
     "pageTitle": "The Cure live concert: 2026-08-21 Manchester - Wythenshawe Park (England) - 'Live From Wythenshawe Park 2026'",
-    "scrapedAt": "2026-11-17T17:53:33+00:00",
+    "scrapedAt": "2026-11-18T12:15:57+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48956,7 +48946,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-23.php",
     "pageTitle": "The Cure live concert: 2026-08-23 Ingliston / Edinburgh - Royal Highland Showgrounds (Scotland) - 'Edinburgh Summer Sessions'",
-    "scrapedAt": "2026-11-17T17:53:35+00:00",
+    "scrapedAt": "2026-11-18T12:15:59+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -48996,7 +48986,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-28.php",
     "pageTitle": "The Cure live concert: 2026-08-28 Bordeaux - Place des Quinconces (France) - 'Pagaille Festival'",
-    "scrapedAt": "2026-11-17T17:53:36+00:00",
+    "scrapedAt": "2026-11-18T12:16:01+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
@@ -49036,7 +49026,7 @@
     "generalVenueCapacity": null,
     "sourceUrl": "https://www.cure-concerts.de/concerts/2026-08-30.php",
     "pageTitle": "The Cure live concert: 2026-08-30 Saint-Cloud / Paris - Domaine National de Saint-Cloud (France) - 'Rock en Seine'",
-    "scrapedAt": "2026-11-17T17:53:38+00:00",
+    "scrapedAt": "2026-11-18T12:16:03+00:00",
     "sources": {
       "primary": "cure-concerts.de",
       "secondary": "setlist.fm"
